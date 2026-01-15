@@ -5,7 +5,7 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvi
 conda install -c conda-forge matplotlib pandas tqdm jupyterlab \
 conda install -c conda-forge tiktoken 
 
-**Importante:** \ 
-No hacer $ conda update --all -c conda-forge -y porque instala una versión de PyTorch sin CUDA \ 
+**Importante:** \
+No hacer $ conda update --all -c conda-forge -y porque instala una versión de PyTorch sin CUDA \
 Para comprobar que está funcionando CUDA en PyTorch ejecutar /appendix_a/version.py
 
