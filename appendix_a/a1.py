@@ -8,6 +8,7 @@ tensor0d = torch.tensor(1)
 print(f"tensor0d type: {type(tensor0d)}")
 print(f"tensor0d dtype: {tensor0d.dtype}")
 print(f"tensor0d dimensions: {tensor0d.ndim}")
+print(f"tensor0d shape: {tensor0d.shape}")
 print()
 
 # Tensor 1D - Vector -  Definido a partir de una lista python
@@ -15,6 +16,7 @@ tensor1d = torch.tensor([1, 2, 3])
 print(f"tensor1d type: {type(tensor1d)}")
 print(f"tensor1d dtype: {tensor1d.dtype}")
 print(f"tensor1d dimensions: {tensor1d.ndim}")
+print(f"tensor1d shape: {tensor1d.shape}")
 print()
 
 
@@ -24,6 +26,7 @@ tensor2d = torch.tensor([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 print(f"tensor2d type: {type(tensor2d)}")
 print(f"tensor2d dtype: {tensor2d.dtype}")
 print(f"tensor2d dimensions: {tensor2d.ndim}")
+print(f"tensor2d shape: {tensor2d.shape}")
 print()
 
 
@@ -33,6 +36,7 @@ tensor3d = torch.tensor([[[1, 2, 3], [4, 5, 6], [7, 8, 9]], [[11, 12, 13], [14, 
 print(f"tensor3d type: {type(tensor3d)}")
 print(f"tensor3d dtype: {tensor3d.dtype}")
 print(f"tensor3d dimensions: {tensor3d.ndim}")
+print(f"tensor3d shape: {tensor3d.shape}")
 print()
 
 
@@ -44,14 +48,14 @@ tensor4d = torch.tensor([
      [[11, 12, 13], [14, 15, 16], [17, 18, 19]],
      [[21, 22, 23], [24, 25, 26], [27, 28, 29]]],
     [[[101, 102, 103], [104, 105, 106], [107, 108, 109]],   # batch 2 - starts at 11
-     [[111, 112, 113], [114, 115, 116], [117, 118, 118]],
+     [[111, 112, 113], [114, 115, 116], [117, 118, 119]],
      [[121, 122, 123], [124, 125, 126], [127, 128, 129]]],
-    [[[21, 22, 23], [24, 25, 26], [27, 28, 29]],   # batch 3 - starts at 21
-     [[30, 31, 32], [33, 34, 35], [36, 37, 38]],
-     [[39, 40, 41], [42, 43, 44], [45, 46, 47]]],
-    [[[31, 32, 33], [34, 35, 36], [37, 38, 39]],   # batch 4 - starts at 31
-     [[40, 41, 42], [43, 44, 45], [46, 47, 48]],
-     [[49, 50, 51], [52, 53, 54], [55, 56, 57]]]
+    [[[201, 202, 203], [204, 205, 206], [207, 208, 209]],   # batch 3 - starts at 21
+     [[211, 212, 213], [214, 215, 216], [217, 218, 219]],
+     [[221, 222, 223], [224, 225, 226], [227, 228, 229]]],
+    [[[301, 302, 303], [304, 305, 306], [307, 308, 309]],   # batch 4 - starts at 31
+     [[311, 312, 213], [314, 315, 316], [317, 318, 319]],
+     [[321, 322, 323], [324, 325, 326], [327, 328, 329]]]
 ])
 print(f"tensor4d type: {type(tensor4d)}")
 print(f"tensor4d dtype: {tensor4d.dtype}")
