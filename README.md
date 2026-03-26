@@ -8,3 +8,4 @@ conda install -c conda-forge tiktoken
 **Importante:** \
 No hacer $ conda update --all -c conda-forge -y porque instala una versión de PyTorch sin CUDA \
 Para comprobar que está funcionando CUDA en PyTorch ejecutar /appendix_a/version.py
+
