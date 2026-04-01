@@ -1,0 +1,87 @@
+import os
+import torch
+
+
+# Constants for our range
+MIN_VAL = -100
+MAX_VAL = 100
+
+# Define the filename
+filename = "dataset_coords.pt"
+
+
+def convierte_a_float32(tensor):
+    tensor = tensor.to(torch.float32)
+    return tensor
+
+print(f"Torch version: {torch.__version__}")
+print(f"CUDA is available. {torch.cuda.is_available()}")
+print(f"Device name: {torch.cuda.get_device_name(0)}")
+print()
+
+# 1. Generate values between 0 and 1
+# 2. Multiply by 200 (makes range 0 to 200)
+# 3. Subtract 100 (makes range -100 to 100)
+train_data = torch.rand(60000, 2, dtype=torch.float32) * (MAX_VAL - MIN_VAL) + MIN_VAL
+
+
+# 2. Extract x and y columns for the calculation
+# [:, 0] gets all rows, first column (x)
+# [:, 1] gets all rows, second column (y)
+x = train_data[:, 0]
+y = train_data[:, 1]
+
+# 3. Define the line: y_line = 2*x - 5
+# To the left/above means y > 2*x - 5. 
+# You requested: Left = 0, Right = 1.
+# Logic: If (y < 2*x - 5) is True, it returns 1 (Right), otherwise 0 (Left).
+train_labels = (y < (2 * x - 5)).to(torch.float32)
+
+
+print(f"tensor dimensions: {train_data.ndim}")
+print(f"tensor dtype: {train_data.dtype}")
+print(f"tensor shape: {train_data.shape}")
+print(f"tensor type: {type(train_data)}")
+
+print(f"Features shape: {train_data.shape}")
+print(f"Labels shape: {train_labels.shape}")
+print(f"Labels dtype: {train_labels.dtype}")
+
+# Show the first 5 entries to verify
+print("\nFirst 5 (x, y) couples and their labels (0=Left, 1=Right):")
+for i in range(5):
+    print(f"Point: {train_data[i].tolist()} -> Label: {train_labels[i].item()}")
+
+# Quick check on the distribution
+ones = torch.sum(train_labels)
+zeros = 60000 - ones
+print(f"\nDistribution - Left (0): {int(zeros)}, Right (1): {int(ones)}")
+
+# --- SAVING ---
+# We store them in a dictionary so they stay paired together
+print(f"Saving tensors to {filename}...")
+data_to_save = {
+    'samples': train_data,
+    'labels': train_labels
+}
+torch.save(data_to_save, filename)
+print("Save complete.\n")
+
+
+# --- LOADING ---
+if os.path.exists(filename):
+    print(f"Loading tensors from {filename}...")
+    loaded_checkpoint = torch.load(filename, weights_only=True)
+
+    # Extract the individual tensors
+    loaded_data = loaded_checkpoint['samples']
+    loaded_labels = loaded_checkpoint['labels']
+
+    print(f"Loaded Data Shape: {loaded_data.shape}")
+    print(f"Loaded Labels Shape: {loaded_labels.shape}")
+
+    # Quick sanity check: are they the same as the original?
+    is_same = torch.equal(train_data, loaded_data)
+    print(f"Verified: Data matches original? {is_same}")
+else:
+    print("File not found!")

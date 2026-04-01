@@ -1,3 +1,10 @@
+# Python generated 
 __pycache__/
-.DS_Store
 .ipynb_checkpoints
+
+
+# MacOS denerated
+.DS_Store
+
+# PyTorch data files
+*.pt
