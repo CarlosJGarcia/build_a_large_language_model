@@ -1,4 +1,69 @@
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Constants for range
+MIN_VAL = -100
+MAX_VAL = 100
+
+
+# Define the filename
+# filename = "dataset_coords.npy"
+
+
+def convierte_a_float32(array):
+    return array.astype(np.float32)
+
+# print(f"NumPy version: {np.__version__}")
+# print()
+
+# 1. Generate values between 0 and 1
+# 2. Multiply by 200 (makes range 0 to 200)
+# 3. Subtract 100 (makes range -100 to 100)
+train_data = np.random.rand(200, 2).astype(np.float32) * (MAX_VAL - MIN_VAL) + MIN_VAL
+
+# 2. Extract x and y columns
+x = train_data[:, 0]
+y = train_data[:, 1]
+
+# 3. Define the line: y_line = 2*x - 5
+# Logic: If (y < 2*x - 5) → 1 (Right), else 0 (Left)
+train_labels = (y < (2 * x - 25)).astype(np.float32)
+
+# (Optional) Save dataset
+# np.save(filename, train_data)
+
+
+# Show the first 5 entries to verify
+print("\nFirst 5 (x, y) couples and their labels (0=Left, 1=Right):")
+for i in range(5):
+    print(f"Point: {train_data[i].tolist()} -> Label: {train_labels[i].item()}")
+
+
+# Convert labels to boolean masks
+mask_0 = train_labels == 0
+mask_1 = train_labels == 1
+
+# Plot points with different colors
+plt.figure(figsize=(6, 6))
+plt.scatter(x[mask_0], y[mask_0], color='blue', s=5, label='Label 0')
+plt.scatter(x[mask_1], y[mask_1], color='red', s=5, label='Label 1')
+
+# Optional: plot the decision boundary y = 2x - 5
+x_line = np.linspace(-100, 100, 100)
+y_line = 2 * x_line - 5
+plt.plot(x_line, y_line, color='green', linestyle='--', label='y = 2x - 5')
+
+plt.xlabel("x")
+plt.ylabel("y")
+plt.title("Dataset Visualization")
+plt.legend()
+plt.grid(True)
+
+
+
+"""
+import os
 import torch
 
 
@@ -85,3 +150,4 @@ if os.path.exists(filename):
     print(f"Verified: Data matches original? {is_same}")
 else:
     print("File not found!")
+"""
