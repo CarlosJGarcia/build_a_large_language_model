@@ -55,6 +55,11 @@ print(network)
 total_params = sum(p.numel() for p in network.parameters())
 print(f"Total parameters: {total_params}")
 
+# Verify model and data are on GPU
+print(f"Model device: {next(network.parameters()).device}")
+print(f"Train data device: {train_points.device}")
+
+
 print()
 print("4. Model training")
 
