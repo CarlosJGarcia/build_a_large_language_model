@@ -6,5 +6,6 @@ __pycache__/
 # MacOS denerated
 .DS_Store
 
-# PyTorch data files
+# PyTorch & NumPy  data files
 *.pt
+*.npz
