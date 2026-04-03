@@ -2,7 +2,7 @@
 
 | Chapter | Completion Status | Date Completed | Notes |
 |---------|------------------|----------------|-------|
-| 1. Introduction | In Progress | - | - |
+| 1. Introduction | Completed | 03/Apr/2026 | - |
 | 2. Fundamentals of LLMs | Not Started | - | - |
 | 3. Data Collection | Not Started | - | - |
 | 4. Model Training | Not Started | - | - |
