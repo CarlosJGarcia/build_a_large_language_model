@@ -9,7 +9,11 @@
 | 5. Evaluation | Not Started | - | - |
 | 6. Deployment | Not Started | - | - |
 | 7. Future Directions | Not Started | - | - |
-
+| Appendinx A. Introduction to PyTorch | In Progress | - | - |
+| Appendinx B. References and further reading | Not Started | - | - |
+| Appendinx C. Exercise solutions | Not Started | - | - |
+| Appendinx D. Adding bells and whistles to the training loop | Not Started | - | - |
+| Appendinx E. Parameter-efficient fine-tunning with LoRA | Not Started | - | - |
 ---
 
 ### Notes
