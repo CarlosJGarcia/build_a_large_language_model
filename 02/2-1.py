@@ -45,6 +45,9 @@ print(f"Len all_words: {vocab_size} (número de tokens en el diccionario)")
 
 
 # 3. A partir de la lista de palabras, creo el vocabulario, una lista de palabras y símbolos únicos donde cada uno tiene un id (variable vocab)
+# Vocabulary: En el conexto de IA, conjunto de palabras únicas, con un número único (token) asociado
+# Dictionary: La estructura Python que se utiliza para guardar el Vocabulario. Es una lista de pares id-contenido
+
 # Muestro los 15 primeros tokens en el diccionario
 vocab = {token:integer for integer,token in enumerate(all_words)}
 for i, item in enumerate(vocab.items()):
@@ -60,9 +63,23 @@ all_tokens = sorted(list(set(preprocessed)))
 all_tokens.extend(["<|endoftext|>", "<|unk|>"])
 vocab = {token:integer for integer,token in enumerate(all_tokens)}
 
-print(len(vocab.items()))
+print("Número de entradas en el Vocabulario: ", len(vocab.items()))
+print("Tipo de dato del Vocabulario: ", type(vocab))
+print()
 
 
+# Muestro los primeros 5 items del vocabulario
+print("Primeros 5 items del Vocabulario:")
+items = list(vocab.items())
+for i in range(5):
+    print(items[i])
+print()
+
+# Muestro los últimos 5 items del vocabulario
+print("Últimos 5 items del Vocabulario:")
+for i, item in enumerate(list(vocab.items())[-5:]):
+    print(item)
+print()
 
 
 
