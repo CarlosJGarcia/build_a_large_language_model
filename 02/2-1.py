@@ -1,6 +1,7 @@
 # Librería de Regular Expressions para el tokenizer
 import re
 
+# 1. Cargo el libro como una cadena de texto (variable raw_text)
 # Abro y cargo el fichero de texto (libro) Manera 'antigua'. Old way - manual, risky
 """
 f = open("file.txt", "r")
@@ -26,6 +27,8 @@ print("Text: ", text)
 print("Result: ", result)
 print()
 
+
+# 2. Creo una lista de palabras y símbolos a partir del texto mediante una expresión regular (variable preprocessed)
 preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
 preprocessed = [item.strip() for item in preprocessed if item.strip()]
 print(f"Len libro: {len(raw_text)} (número de caracteres en la variable tipo text string)")
@@ -40,6 +43,8 @@ vocab_size = len(all_words)
 
 print(f"Len all_words: {vocab_size} (número de tokens en el diccionario)")
 
+
+# 3. A partir de la lista de palabras, creo el vocabulario, una lista de palabras y símbolos únicos donde cada uno tiene un id (variable vocab)
 # Muestro los 15 primeros tokens en el diccionario
 vocab = {token:integer for integer,token in enumerate(all_words)}
 for i, item in enumerate(vocab.items()):
@@ -47,6 +52,18 @@ for i, item in enumerate(vocab.items()):
     if i >= 15:
         break
 print()
+
+
+
+# Añado dos palabras al vocabulario: <|endoftext|> para separar textos diferentes y <|junk|> para identificar con un token palabras que no estén en el dicc.
+all_tokens = sorted(list(set(preprocessed)))
+all_tokens.extend(["<|endoftext|>", "<|unk|>"])
+vocab = {token:integer for integer,token in enumerate(all_tokens)}
+
+print(len(vocab.items()))
+
+
+
 
 
 # Clase Tokenizer
@@ -70,6 +87,7 @@ class SimpleTokenizerV1:
         return text 
 
 
+# 4. Creo un objeto tokenizer a partir de la clase SimpleTokenizerV1 y del vocabulario
 text = "It's the last he painted, you know, Mrs. Gisburn said with pardonable pride."
 tokenizer = SimpleTokenizerV1(vocab)
 
@@ -77,4 +95,9 @@ tokenizer = SimpleTokenizerV1(vocab)
 print("Codificando.")
 ids = tokenizer.encode(text)
 print("Texto: ", text)
-print("Codificado: ", ids)   
+print("Codificado: ", ids)  
+print("Decodificado: ", tokenizer.decode(ids))
+
+
+
+
