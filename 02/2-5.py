@@ -1,4 +1,4 @@
-# BPE (byte pair enconding) tokenization
+# BPE (byte pair enconding) tokenization - Tiktoken library
 # Kaiseraugst 07/Apr/2026
 
 import tiktoken
@@ -32,4 +32,32 @@ strings = tokenizer.decode(integers)
 print("Texto: ", text)
 print("Tokens: ", integers)
 print("Back to text: ", strings)
+print()
+
+
+# Tokenizar el libro "The Veredict"
+with open("the-verdict.txt", "r", encoding="utf-8") as f:
+    print("Reading file")
+    raw_text = f.read()
+
+integers = tokenizer.encode(raw_text)
+strings = tokenizer.decode(integers)
+print("Texto: ", raw_text)
+print("Tokens: ", integers)
+print("Total number of tokens:", len(integers))
+print("Back to text: ", strings)
+
+
+#Quito los primeros 50 tokens. enc_sample = todo los tokens desde el número 51 al final
+enc_sample = integers[50:]
+
+
+# Creo los pares input-target
+# x: input
+# y: target
+context_size = 4
+x = enc_sample[:context_size]
+y = enc_sample[1:context_size+1]
+print(f"x: {x}")
+print(f"y:      {y}") 
 
