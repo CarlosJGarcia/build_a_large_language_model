@@ -3,9 +3,12 @@ __pycache__/
 .ipynb_checkpoints
 
 
-# MacOS denerated
+# MacOS generated
 .DS_Store
 
 # PyTorch & NumPy  data files
 *.pt
 *.npz
+
+# VS Code generated
+.vscode/
