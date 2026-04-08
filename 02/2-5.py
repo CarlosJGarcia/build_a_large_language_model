@@ -5,9 +5,6 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-import tiktoken
-from importlib.metadata import version
-
 # Compruebo versión de torch
 print(f"Torch version: {torch.__version__}")
 
@@ -19,20 +16,18 @@ class GPTDatasetV1(Dataset):
 
         token_ids = tokenizer.encode(txt)
 
+        for i in range(0, len(token_ids) - max_lenght, stride):
+            input_chunk = token_ids[i:i + max_lenght + 1]
+            target_chunk = token_ids[i + 1: i + max_lenght + 1]
+            self.input_ids.append(torch.tensor(input_chunk))
+            self.target_ids.append(torch.tensor(target_chunk))
 
+    def __len__(self):
+        return len(self.input_ids)
+    
+    def __getitem__(self, idx):
+        return self.input_ids[idx], self.target_ids[idx]
 
-
-# Compruebo versión de tiktoker
-print(f"tiktoken version: {version('tiktoken')}")
-
-
-
-
-
-# Creo un objeto tokenizer tipo GPT2
-print("Creando objeto tokenizer - Tiktoker GPT2")
-tokenizer = tiktoken.get_encoding("gpt2")
-print()
 
 
 
