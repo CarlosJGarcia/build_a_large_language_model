@@ -1,6 +1,13 @@
 # Librería de Regular Expressions para el tokenizer
 import re
 
+# Pause 0 and break
+import sys
+
+# Data: "The Verdict" short story, released into public domain thus permitted to be used for LLM training
+BOOK_PATH = "../data/raw/the-verdict.txt"
+
+
 # 1. Cargo el libro como una cadena de texto (variable raw_text)
 # Abro y cargo el fichero de texto (libro) Manera 'antigua'. Old way - manual, risky
 """
@@ -10,13 +17,18 @@ f.close()  # ← easy to forget! and won't run if an error occurs above
 """
 
 # New way, with 'Python Context Manager' (with ... as). Una especie de try - catch
-with open("the-verdict.txt", "r", encoding="utf-8") as f:
+with open(BOOK_PATH, "r", encoding="utf-8") as f:
     print("Reading file")
     raw_text = f.read()
 
 print("Total number of characters:", len(raw_text))
 print(raw_text[:99])
 print()
+
+# Pause 0
+print()
+key = input("Press ENTER to exit.")
+sys.exit(1)
 
 
 # Tokenizador manual
