@@ -1,21 +1,31 @@
 import tiktoken
+from rich.console import Console
 from datasets import load_dataset
 
-# 1. Load the tokenizer and the dataset
-enc = tiktoken.get_encoding("gpt2")
-dataset = load_dataset("openwebtext", split="train")
+DATASET_ID = "Skylion007/openwebtext"
+SPLIT = "train"  
+NUM_PROC = 22                # Number of parallel process = number or CPU threads used. The Z640 Xeon has 14 cores = 28 threads
+                             # Pero, como openwebtext está dividido en solo 12 ficheros (shards), solo habrá 12 procesos corriendo en la CPU, uno en cada thread
 
-# 2. Define a wrapper function for the map
+# Define a wrapper function for the map. This function encodes the text and returns the IDs. encode_ordinary is slightly faster than encode
 def process_text(example):
-    # Encode the text and return the IDs
-    ids = enc.encode_ordinary(example['text']) # encode_ordinary is slightly faster than encode!
+    ids = tokenizer.encode_ordinary(example['text']) 
     return {'ids': ids, 'len': len(ids)}
 
-# 3. Fire up all the Xeon Cores!
-# We set num_proc=14 to map exactly to your CPU's physical cores
+# Creo un objeto tokenizer tipo GPT2
+console = Console()
+console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
+tokenizer = tiktoken.get_encoding("gpt2")
+
+# Load the dataset
+dataset = load_dataset(DATASET_ID, split=SPLIT)
+
+# Fire up all the Xeon Cores!
+console.print(f"\nTokenizing", style="gold1")
 tokenized_dataset = dataset.map(
     process_text,
     remove_columns=['text'], # Drop the raw text to save memory
     desc="Tokenizing OpenWebText",
-    num_proc=14, 
+    num_proc=NUM_PROC,
+    load_from_cache_file=False  # Forces the CPU to do the work again 
 )
