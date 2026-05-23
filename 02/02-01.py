@@ -1,5 +1,6 @@
+# Tokenizer - Conceptos básicos
 
-import re                          # Regular Expressions
+import re                        
 from rich.console import Console
 
 # Libro "The Verdict" short story, public domain and permitted for LLM training
@@ -156,6 +157,7 @@ ids = tokenizer.encode(text)
 print("Texto: ", text)
 print("Codificado: ", ids)
 print("Decodificado: ", tokenizer.decode(ids))
+print()
 
 
 

@@ -1,14 +1,19 @@
-# BPE (byte pair enconding) tokenization - Tiktoken library
+# BPE (byte pair enconding) tokenization
+# OpenAI Tiktoken library
 # Kaiseraugst 07/Apr/2026
 
 import tiktoken
+from rich.console import Console
 from importlib.metadata import version
+
+BOOK_PATH = "../data/raw/the-verdict.txt"
 
 # Compruebo versión de tiktoker
 print("tiktoken version:", version("tiktoken"))
 
 # Creo un objeto tokenizer tipo GPT2
-print("Creando objeto tokenizer - Tiktoker GPT2")
+console = Console()
+console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
 print()
 
@@ -35,17 +40,27 @@ print("Back to text: ", strings)
 print()
 
 
-# Tokenizar el libro "The Veredict"
-with open("the-verdict.txt", "r", encoding="utf-8") as f:
-    print("Reading file")
+# Carga el libro "The Veredict"
+with open(BOOK_PATH, "r", encoding="utf-8") as f:
+    console.print(f"Reading file", style="gold1")
     raw_text = f.read()
 
+# Tokeniza el libro
+console.print(f"Tokenizing", style="gold1")
 integers = tokenizer.encode(raw_text)
-strings = tokenizer.decode(integers)
-print("Texto: ", raw_text)
-print("Tokens: ", integers)
 print("Total number of tokens:", len(integers))
-print("Back to text: ", strings)
+
+# Muestra todo el texto del libro
+#print("Texto: ", raw_text)
+
+# Muestra todos los tokens
+#print("Tokens: ", integers)
+
+# Genera el texto a partir de los tokens
+strings = tokenizer.decode(integers)
+
+# Muestra todo el texto del libro, a partir de los tokens
+#print("Back to text: ", strings)
 
 
 #Quito los primeros 50 tokens. enc_sample = todo los tokens desde el número 51 al final
@@ -58,7 +73,7 @@ enc_sample = integers[50:]
 context_size = 4
 x = enc_sample[:context_size]
 y = enc_sample[1:context_size+1]
-print(f"x: {x}")
+print(f"\nx: {x}")
 print(f"y:      {y}")
 print() 
 
