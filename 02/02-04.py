@@ -15,8 +15,6 @@ print("tiktoken version:", version("tiktoken"))
 console = Console()
 console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
-print()
-
 
 # Prueba, incluyendo un marcador de cambio de fuente de datos "<|endoftext|>" y una palabra que no está en el diccionario "some-unknownPlace"
 text = "Hello, do you like tea? <|endoftext|> In the sunlit terrace of some-unknownPlace."
@@ -45,6 +43,8 @@ with open(BOOK_PATH, "r", encoding="utf-8") as f:
     console.print(f"Reading file", style="gold1")
     raw_text = f.read()
 
+print("Total number of words (original):", len(raw_text))
+
 # Tokeniza el libro
 console.print(f"Tokenizing", style="gold1")
 integers = tokenizer.encode(raw_text)
@@ -57,7 +57,9 @@ print("Total number of tokens:", len(integers))
 #print("Tokens: ", integers)
 
 # Genera el texto a partir de los tokens
+console.print(f"Decoding", style="gold1")
 strings = tokenizer.decode(integers)
+print("Total number of words (decoded):", len(strings))
 
 # Muestra todo el texto del libro, a partir de los tokens
 #print("Back to text: ", strings)
@@ -88,3 +90,14 @@ for i in range(1, context_size+1):
     desired = enc_sample[i]
     print(tokenizer.decode(context), "---->", tokenizer.decode([desired]))
 print()
+
+
+# Workflow
+# --------
+# CPU: Cargar el texto desde disco (the-verdict.txt)
+# CPU: Mediante tiktoken, convertir el texto a IDs (valores enteros = números positivos sin decimales) - tokenizar
+# CPU: Conventir los enteros en Tensores PyTorch
+# Transferencia a la GPU  inputs = tensor.to('cuda')).
+# GPU: The heavy neural network (like your Phi-4 or your scratch-built LLM) uses thousands of CUDA cores to do all the massive math on those numbers to predict the next token.
+# Transferencia: La GPU devuelve a la CPU un ID - valor entero- que es la siguiente palabra prevista
+# CPU: Mediante tiktoken, converitr el ID entero en texto y mostrarlo en pantalla
