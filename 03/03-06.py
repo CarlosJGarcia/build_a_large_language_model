@@ -1,8 +1,9 @@
-# Implementing a compact causal attention class
+# Implementing causal attention
 
 import torch
 import torch.nn as nn
 
+# Causal attention class
 class CausalAttention(nn.Module):
     def __init__(self, d_in, d_out, context_length,
                 dropout, qkv_bias=False):
@@ -35,7 +36,7 @@ class CausalAttention(nn.Module):
         context_vec = attn_weights @ values
         return context_vec
 
-# To simulate batches consisting of more than one input, we duplicate the input text example
+
 inputs = torch.tensor(
   [[0.43, 0.15, 0.89], # Your     (x^1)
    [0.55, 0.87, 0.66], # journey  (x^2)
@@ -48,6 +49,7 @@ inputs = torch.tensor(
 d_in = inputs.shape[1]
 d_out = 2   
 
+# To simulate batches consisting of more than one input, we duplicate the input text example
 batch = torch.stack((inputs, inputs), dim=0)
 print(batch.shape)
 print()              
