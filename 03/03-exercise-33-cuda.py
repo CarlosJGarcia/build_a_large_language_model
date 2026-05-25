@@ -1,5 +1,5 @@
 
-# Implementing multi-head attention with weight splits
+# Implementing multi-head attention with weight splits. Versión GPU
 
 # Dimensions:
 # 12 attention heads
@@ -72,25 +72,33 @@ console = Console()
 console.print(f"\nMulti-head attention with GPT-2/BERT base dimensions", style="gold1")
 torch.manual_seed(123)
 
+# Configuración GPU RTX
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
+print()
+
 # Input and output embedding size
 d_in = 768
 d_out = 768
-
 batch_size = 2 # Simulate a batch of 2 sequences
 
 # En lugar de poner los datos a mano, uso generación aleatorioa de los valores
-batch = torch.randn(batch_size, CONTEXT_LENGHT, d_in)
+# Añado al final .to(device) para mover los datos a la GPU
+batch = torch.randn(batch_size, CONTEXT_LENGHT, d_in).to(device)
 print(f"Input batch shape: {batch.shape}")
+print(f"Input batch device: {batch.device}")
 print()
 
-# Instantiate the model
+
+# Instantiate the model + moverlo a la GPU, añadientod .(device)
+# Al hacer esto, los pesos del modelo están almacenados en VRAM
 mha = MultiHeadAttention(
     d_in=d_in, 
     d_out=d_out, 
     context_length=CONTEXT_LENGHT, 
     dropout=0.0, 
     num_heads=NUM_HEADS
-)
+).to(device)
 
 # Run the forward pass
 context_vecs = mha(batch)
