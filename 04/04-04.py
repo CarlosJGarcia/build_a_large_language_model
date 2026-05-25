@@ -2,8 +2,9 @@
 
 import torch
 import torch.nn as nn
+from rich.console import Console
 
-# Defino una clase GELU a partir de (herencia) la clase Module de la librería Torch Neural Network (torch.nn)
+# Defino una clase GELU a partir de (herencia) la clase Module de la librería torch.nn (Torch Neural Network)
 class GELU(nn.Module):
     # Contructor de la clase GELU que llama al constructor de la superclase (Module)
     def __init__(self):
@@ -68,4 +69,12 @@ model_without_shortcut = ExampleDeepNeuralNetwork(
 # Use the print_gradients function and apply it to the model without skip connections
 print_gradients(model_without_shortcut, sample_input)
 
+# Instantiate a model with skip connections and see how it compares
+console = Console()
+console.print(f"\nExampleDeepNeuralNetwork", style="gold1")
+torch.manual_seed(123)
+model_with_shortcut = ExampleDeepNeuralNetwork(
+    layer_sizes, use_shortcut=True
+)
+print_gradients(model_with_shortcut, sample_input)
 print()
