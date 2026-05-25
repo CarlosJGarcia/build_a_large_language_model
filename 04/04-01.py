@@ -1,5 +1,7 @@
 import torch
+import tiktoken
 import torch.nn as nn
+from rich.console import Console
 
 NUM_HEADS = 12
 CONTEXT_LENGHT = 1024
@@ -70,6 +72,31 @@ class DummyLayerNorm(nn.Module):                           #5
 #5 A simple placeholder class that will be replaced by a real LayerNorm later
 #6 The parameters here are just to mimic the LayerNorm interface.
 
+# Data
+txt1 = "Every effort moves you"
+txt2 = "Every day holds a"
 
-print("Todo bien!")
+
+# Creo un objeto tokenizer tipo GPT2
+console = Console()
+console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
+tokenizer = tiktoken.get_encoding("gpt2")
+
+batch = []
+batch.append(torch.tensor(tokenizer.encode(txt1)))
+batch.append(torch.tensor(tokenizer.encode(txt2)))
+batch = torch.stack(batch, dim=0)
+print("Tokenized batch data:", batch)
+
+
+# Initialize a 124-million-parameter DummyGPTModel
+console.print(f"\nDummyGPTModel", style="gold1")
+torch.manual_seed(123)
+model = DummyGPTModel(GPT_CONFIG_124M)
+
+
+# Feed the model with the tokenized batch
+logits = model(batch)
+print("Output shape:", logits.shape)
+print("Logits:", logits)
 print()
