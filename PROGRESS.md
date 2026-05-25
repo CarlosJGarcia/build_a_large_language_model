@@ -2,7 +2,7 @@
 
 | Chapter | Completion Status | Date Completed | Notes |
 |---------|------------------|----------------|-------|
-| 1. Introduction | Completed | 03/Apr/2026 | - |
+| 1. Understanding Large Language Models | Completed | 03/Apr/2026 | Introduction |
 | 2. Working with text data (Tokenizer) | Completed | 23/May/2026  | - |
 | 3. Coding attention mechanisms (Attention) | Completed | 25/May/2026 | - |
 | 4. Implementing a GPT model from scratch to generate text | Not Started | - | - |
