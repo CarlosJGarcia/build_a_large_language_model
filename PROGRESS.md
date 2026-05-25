@@ -4,7 +4,7 @@
 |---------|------------------|----------------|-------|
 | 1. Understanding Large Language Models | Completed | 03/Apr/2026 | Introduction |
 | 2. Working with text data | Completed | 23/May/2026  | Tokenizer + Embedding |
-| 3. Coding attention mechanisms | Completed | 25/May/2026 | Attention - Masked, multi-head attention |
+| 3. Coding attention mechanisms (Attention) | Completed | 25/May/2026 | Masked, multi-head attention |
 | 4. Implementing a GPT model from scratch to generate text | Not Started | - | LLM Architecture |
 | 5. Evaluation | Not Started | - | - |
 | 6. Deployment | Not Started | - | - |
