@@ -3,9 +3,9 @@
 | Chapter | Completion Status | Date Completed | Notes |
 |---------|------------------|----------------|-------|
 | 1. Introduction | Completed | 03/Apr/2026 | - |
-| 2. Fundamentals of LLMs | Not Started | - | - |
-| 3. Data Collection | Not Started | - | - |
-| 4. Model Training | Not Started | - | - |
+| 2. Working with text data (Tokenizer) | Completed | 23/May/2026  | - |
+| 3. Coding Attention Mechanisms (Attention) | Completed | 25/May/2026 | - |
+| 4. Implementing a GPT model from scratch to generate text | Not Started | - | - |
 | 5. Evaluation | Not Started | - | - |
 | 6. Deployment | Not Started | - | - |
 | 7. Future Directions | Not Started | - | - |
