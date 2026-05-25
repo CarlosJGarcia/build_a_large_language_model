@@ -244,7 +244,6 @@ console.print(f"\nModel memory usage", style="gold1")
 total_size_bytes = total_params * 4       #1
 total_size_mb = total_size_bytes / (1024 * 1024)     #2
 print(f"Total size of the model: {total_size_mb:.2f} MB")
-print()
 
 # Pause 0
 print()
