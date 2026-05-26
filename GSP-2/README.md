@@ -4,3 +4,12 @@ GSP-2 is a medium-scale Large Language Model (LLM) comprising approximately 400 
 
 Carlos García \
 Kaiseraugst, May 2026
+
+
+| File | Description | 
+|---------|------------------|
+| 02-04-openwebtext.py | Load openwebtext and tokenize | 
+| 02-07.py | Tokenizing and embedding | 
+| 04-06.py | GPT (Generative Pretrained Transformer) model architecture implementation, small size (124 M param)| 
+| 04-06-cuda.py | 04-06 with CUDA instead of CPU | 
+| 04-exercise-42-cuda.py | 04-06-cuda, in medium size (400 M param) instead of small | 

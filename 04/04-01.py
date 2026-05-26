@@ -100,3 +100,6 @@ logits = model(batch)
 print("Output shape:", logits.shape)
 print("Logits:", logits)
 print()
+
+
+# Layer normalization. This is requited to provide stability and efficiency of neural network training. Otherwise the network doesn't find values for the parameters
