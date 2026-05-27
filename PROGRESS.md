@@ -6,7 +6,7 @@
 | 2. Working with text data | Completed | 23/May/2026  | Tokenizer + Embedding |
 | 3. Coding attention mechanisms (Attention) | Completed | 25/May/2026 | Masked multi-head attention |
 | 4. Implementing a GPT model from scratch to generate text | Completed | 27/May/2026 | LLM Architecture |
-| 5. Pretraining on unlabelled data | Not Started | - | - |
+| 5. Pretraining on unlabeled data | Not Started | - | - |
 | 6. Fine-tunning for classification | Not Started | - | - |
 | 7. Fine-tunning to follow instructions | Not Started | - | - |
 | Appendix A. Introduction to PyTorch | In Progress | - | - |
