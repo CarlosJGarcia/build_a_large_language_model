@@ -4,7 +4,10 @@ import torch.nn as nn
 from rich.console import Console
 
 NUM_HEADS = 12
-CONTEXT_LENGHT = 1024
+
+# We shorten the context length from 1,024 to 256 tokens
+# This reduces the computational demands of training the model, making it possible to carry out the training on a standard laptop
+CONTEXT_LENGHT = 256
 
 # Input and output embedding size (no se usan, pero las pongo por referencia)
 d_in = 768
@@ -198,15 +201,39 @@ def generate_text_simple(model, idx,                           #1
 #5 idx_next has shape (batch, 1).
 #6 Appends sampled index to the running sequence, where idx has shape (batch, n_tokens+1)
 
+# Function for text to token conversion
+def text_to_token_ids(text, tokenizer):
+    encoded = tokenizer.encode(text, allowed_special={'<|endoftext|>'})
+    encoded_tensor = torch.tensor(encoded).unsqueeze(0)    #1
+    return encoded_tensor
+
+# Function for token to text conversion
+def token_ids_to_text(token_ids, tokenizer):
+    flat = token_ids.squeeze(0)                #2
+    return tokenizer.decode(flat.tolist())
+
+
 # Creo un objeto tokenizer tipo GPT2
 console = Console()
 console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
+
 
 # Instantiate a GPTModel and feed it some sample data:
 console = Console()
 console.print(f"\nInstance TransformerBlock", style="gold1")
 torch.manual_seed(123)
 model = GPTModel(GPT_CONFIG_124M)
+
+start_context = "Every effort moves you"
+
+token_ids = generate_text_simple(
+    model=model,
+    idx=text_to_token_ids(start_context, tokenizer),
+    max_new_tokens=10,
+    context_size=GPT_CONFIG_124M["context_length"]
+)
+print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
+
 
 print()
