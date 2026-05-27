@@ -6,14 +6,14 @@
 | 2. Working with text data | Completed | 23/May/2026  | Tokenizer + Embedding |
 | 3. Coding attention mechanisms (Attention) | Completed | 25/May/2026 | Masked multi-head attention |
 | 4. Implementing a GPT model from scratch to generate text | Completed | 27/May/2026 | LLM Architecture |
-| 5. Evaluation | Not Started | - | - |
-| 6. Deployment | Not Started | - | - |
-| 7. Future Directions | Not Started | - | - |
-| Appendinx A. Introduction to PyTorch | In Progress | - | - |
-| Appendinx B. References and further reading | Not Started | - | - |
-| Appendinx C. Exercise solutions | Not Started | - | - |
-| Appendinx D. Adding bells and whistles to the training loop | Not Started | - | - |
-| Appendinx E. Parameter-efficient fine-tunning with LoRA | Not Started | - | - |
+| 5. Pretraining on unlabelled data | Not Started | - | - |
+| 6. Fine-tunning for classification | Not Started | - | - |
+| 7. Fine-tunning to follow instructions | Not Started | - | - |
+| Appendix A. Introduction to PyTorch | In Progress | - | - |
+| Appendix B. References and further reading | Not Started | - | - |
+| Appendix C. Exercise solutions | Not Started | - | - |
+| Appendix D. Adding bells and whistles to the training loop | Not Started | - | - |
+| Appendix E. Parameter-efficient fine-tunning with LoRA | Not Started | - | - |
 ---
 
 ### Notes
