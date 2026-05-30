@@ -316,4 +316,10 @@ total_tokens = len(integers)
 print("Characters:", total_characters)
 print("Tokens:", total_tokens)
 
+# Dividimos el texto del libro en train_data / validation_data
+train_ratio = 0.90
+split_idx = int(train_ratio * len(raw_text))
+train_data = raw_text[:split_idx]
+val_data = raw_text[split_idx:]
+
 
