@@ -303,7 +303,7 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device,
                 train_losses.append(train_loss)
                 val_losses.append(val_loss)
                 track_tokens_seen.append(tokens_seen)
-                print(f"Ep {epoch+1} (Step {global_step:06d}): "
+                print(f"Epoch {epoch+1} (Step {global_step:06d}): "
                       f"Train loss {train_loss:.3f}, "
                       f"Val loss {val_loss:.3f}")
 
@@ -431,8 +431,9 @@ if __name__ == "__main__":
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
     
-    # Adjusted to 1 Epoch for large corpus training efficiency
-    NUM_EPOCHS = 1 
+    # 1 Epoch for large corpus training efficiency
+    # 10 Epochs better learning result. The ideal number for this dataset (30 books) is between 5 and 15 epochs
+    NUM_EPOCHS = 10
     
     train_losses, val_losses, tokens_seen = train_model_simple(
         model, train_loader, val_loader, optimizer, device,
