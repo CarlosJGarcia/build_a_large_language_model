@@ -417,8 +417,8 @@ print("\nValidation loader:")
 for x, y in val_loader:
     print(x.shape, y.shape)
 
-# Training
-console.print(f"\nTraining", style="gold1")
+# Let's see calc_loss_loader in action
+console.print(f"\ncalc_loss_loader", style="gold1")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if torch.cuda.is_available():
     console.print(f"On GPU", style="bright_blue")
