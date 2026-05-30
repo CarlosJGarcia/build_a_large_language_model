@@ -5,7 +5,8 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvi
 conda install -c conda-forge matplotlib pandas tqdm jupyterlab \
 conda install -c conda-forge tiktoken \
 conda install -c conda-forge rich \
-pip install datasets
+pip install datasets \
+conda install -c conda-forge lxml -y
 
 **Importante:** \
 No hacer `$ conda update --all -c conda-forge -y` porque instala una versión de PyTorch sin CUDA \
