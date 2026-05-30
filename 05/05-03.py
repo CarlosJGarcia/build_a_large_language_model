@@ -31,6 +31,7 @@ GPT_CONFIG_124M = {
 }
 
 BOOK_PATH = "../data/raw/the-verdict.txt"
+IMAGE_FILE = "training_validation_losses.png"
 
 
 # Multi-head attention with weight splits
@@ -373,6 +374,9 @@ def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
     ax2.set_xlabel("Tokens seen")
     fig.tight_layout()
     plt.show()
+
+    plt.savefig(IMAGE_FILE, dpi=300) 
+    print(f"Plot saved successfully as {IMAGE_FILE}")
 
 
 inputs = torch.tensor([[16833, 3626, 6100],   # ["every effort moves",
