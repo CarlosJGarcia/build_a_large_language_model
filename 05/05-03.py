@@ -26,6 +26,9 @@ GPT_CONFIG_124M = {
     "qkv_bias": False                  # Query-Key-Value bias
 }
 
+BOOK_PATH = "../data/raw/the-verdict.txt"
+
+
 # Multi-head attention with weight splits
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_in, d_out, 
@@ -296,3 +299,21 @@ print()
 # Cálculo de cross entropy usando el método de PyTorch
 loss = torch.nn.functional.cross_entropy(logits_flat, targets_flat)
 print(loss)
+
+console.print(f"\nPerplexity", style="gold1")
+
+# Carga el libro "The Veredict"
+with open(BOOK_PATH, "r", encoding="utf-8") as f:
+    console.print(f"Reading file", style="gold1")
+    raw_text = f.read()
+total_characters = len(raw_text)
+
+# Tokeniza el libro
+console.print(f"Tokenizing", style="gold1")
+integers = tokenizer.encode(raw_text)
+total_tokens = len(integers)
+
+print("Characters:", total_characters)
+print("Tokens:", total_tokens)
+
+
