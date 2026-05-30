@@ -2,7 +2,6 @@
 __pycache__/
 .ipynb_checkpoints
 
-
 # MacOS generated
 .DS_Store
 
@@ -11,4 +10,9 @@ __pycache__/
 *.npz
 
 # VS Code generated
-.vscode/
+.vscode
+
+
+# Codigo para importar los libros del Gutemberg Project directamente
+05/03_bonus_pretraining_on_gutenberg/gutenberg/
+05/03_bonus_pretraining_on_gutenberg/gutenberg_preprocessed/
