@@ -6,7 +6,9 @@ conda install -c conda-forge matplotlib pandas tqdm jupyterlab \
 conda install -c conda-forge tiktoken \
 conda install -c conda-forge rich \
 pip install datasets \
-conda install -c conda-forge lxml -y
+conda install -c conda-forge lxml -y \
+conda install -c conda-forge nltk -y
+
 
 **Importante:** \
 No hacer `$ conda update --all -c conda-forge -y` porque instala una versión de PyTorch sin CUDA \
