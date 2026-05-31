@@ -1,6 +1,12 @@
 # Pretrain the LLM using 30 books from project gutemberg 
-
 # 05-04.py
+
+# What the Model does during the training epochs
+# When you stopped the first run at Epoch 1, the model was still in "kindergarten." Over the next 9 epochs, it underwent a massive conceptual shift
+# Epoch 1 (What you see in Graph 1): The model is just learning basic token mechanics. It figures out that the letter "t" is often followed by "h" and "e", and that common words like "the", "and", and "of" appear frequently. It has zero concept of how a full sentence is structured.
+#Epochs 2–5: The model begins mastering local syntax. It learns parts of speech—that nouns follow adjectives, verbs follow subjects, and quotation marks need to close.
+#Epochs 6–10 (What you see in Graph 2): The model adapts to the macro-style of your 30 Project Gutenberg books. It begins tracking long-range context (remembering the subject from 50 tokens back) and heavily mimics the 19th-century vocabulary, formatting, and pacing of the novels.
+
 import os
 import glob
 import torch
@@ -29,6 +35,13 @@ GPT_CONFIG_124M = {
     "qkv_bias": False                  # Query-Key-Value bias
 }
 
+# Batch_size up to 4 for efficient GPU processing (4 GB VRAM usage)
+# Batch_size = 64 for better use of the RTX 3060
+BATCH_SIZE = 64
+
+# 1 Epoch for large corpus training efficiency
+# 10 Epochs better learning result. The ideal number for this dataset (30 books) is between 5 and 15 epochs
+NUM_EPOCHS = 10
 
 # ==========================================
 # 1. ARCHITECTURE MODULES
@@ -389,8 +402,7 @@ if __name__ == "__main__":
 
     torch.manual_seed(123)
     
-    # Bumped batch_size up to 4 for efficient GPU processing
-    BATCH_SIZE = 4 
+  
 
     train_loader = create_dataloader_v1(
         train_data,
@@ -430,10 +442,7 @@ if __name__ == "__main__":
     torch.manual_seed(123)
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
-    
-    # 1 Epoch for large corpus training efficiency
-    # 10 Epochs better learning result. The ideal number for this dataset (30 books) is between 5 and 15 epochs
-    NUM_EPOCHS = 10
+
     
     train_losses, val_losses, tokens_seen = train_model_simple(
         model, train_loader, val_loader, optimizer, device,
