@@ -4,8 +4,8 @@
 # What the Model does during the training epochs
 # When you stopped the first run at Epoch 1, the model was still in "kindergarten." Over the next 9 epochs, it underwent a massive conceptual shift
 # Epoch 1 (What you see in Graph 1): The model is just learning basic token mechanics. It figures out that the letter "t" is often followed by "h" and "e", and that common words like "the", "and", and "of" appear frequently. It has zero concept of how a full sentence is structured.
-#Epochs 2–5: The model begins mastering local syntax. It learns parts of speech—that nouns follow adjectives, verbs follow subjects, and quotation marks need to close.
-#Epochs 6–10 (What you see in Graph 2): The model adapts to the macro-style of your 30 Project Gutenberg books. It begins tracking long-range context (remembering the subject from 50 tokens back) and heavily mimics the 19th-century vocabulary, formatting, and pacing of the novels.
+# Epochs 2–5: The model begins mastering local syntax. It learns parts of speech—that nouns follow adjectives, verbs follow subjects, and quotation marks need to close.
+# Epochs 6–10 (What you see in Graph 2): The model adapts to the macro-style of your 30 Project Gutenberg books. It begins tracking long-range context (remembering the subject from 50 tokens back) and heavily mimics the 19th-century vocabulary, formatting, and pacing of the novels.
 
 import os
 import glob
@@ -42,6 +42,9 @@ BATCH_SIZE = 64
 # 1 Epoch for large corpus training efficiency
 # 10 Epochs better learning result. The ideal number for this dataset (30 books) is between 5 and 15 epochs
 NUM_EPOCHS = 10
+
+MODEL_PATH = "../models/gpt_124m/gpt_124m_final.pth"
+
 
 # ==========================================
 # 1. ARCHITECTURE MODULES
@@ -453,3 +456,6 @@ if __name__ == "__main__":
     # --- Step F: Generate and Metrics Output ---
     epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
     plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+
+    # Guarda el modelo
+    torch.save(model.state_dict(), MODEL_PATH)
