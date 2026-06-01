@@ -1,11 +1,11 @@
 # Pretrain the LLM using 30 books from project gutemberg 
-# 05-04.py
+# Reinach 01/Jun/2026
 
-# What the Model does during the training epochs
-# When you stopped the first run at Epoch 1, the model was still in "kindergarten." Over the next 9 epochs, it underwent a massive conceptual shift
-# Epoch 1 (What you see in Graph 1): The model is just learning basic token mechanics. It figures out that the letter "t" is often followed by "h" and "e", and that common words like "the", "and", and "of" appear frequently. It has zero concept of how a full sentence is structured.
-# Epochs 2–5: The model begins mastering local syntax. It learns parts of speech—that nouns follow adjectives, verbs follow subjects, and quotation marks need to close.
-# Epochs 6–10 (What you see in Graph 2): The model adapts to the macro-style of your 30 Project Gutenberg books. It begins tracking long-range context (remembering the subject from 50 tokens back) and heavily mimics the 19th-century vocabulary, formatting, and pacing of the novels.
+# What the Model does during the training epochs:
+# When you stopped the first run at Epoch 1, the model was still in "kindergarten." Over the next 9 epochs, it undergoes a massive conceptual shift
+# Epoch 1: The model is just learning basic token mechanics. It figures out that the letter "t" is often followed by "h" and "e", and that common words like "the", "and", and "of" appear frequently. It has zero concept of how a full sentence is structured.
+# Epochs 2–5: The model begins mastering local syntax. It learns parts of speech, that nouns follow adjectives, verbs follow subjects, and quotation marks need to close.
+# Epochs 6–10: The model adapts to the macro-style of your 30 Project Gutenberg books. It begins tracking long-range context (remembering the subject from 50 tokens back) and heavily mimics the 19th-century vocabulary, formatting, and pacing of the novels.
 
 import os
 import glob
@@ -20,9 +20,6 @@ from matplotlib.ticker import MaxNLocator
 # Configuration Constants
 NUM_HEADS = 12
 CONTEXT_LENGTH = 256
-# Updated path to point exactly where your data was saved from your current 05/ position
-DATA_DIR = "03_bonus_pretraining_on_gutenberg/gutenberg_preprocessed"
-IMAGE_FILE = "training_validation_losses.png"
 
 # GPT-2 124M Base Configuration
 GPT_CONFIG_124M = {
@@ -36,19 +33,21 @@ GPT_CONFIG_124M = {
 }
 
 # Batch_size up to 4 for efficient GPU processing (4 GB VRAM usage)
-# Batch_size = 64 for better use of the RTX 3060
-BATCH_SIZE = 64
+# Batch_size = 16 for the RTX 3060 
+BATCH_SIZE = 16
 
 # 1 Epoch for large corpus training efficiency
 # 10 Epochs better learning result. The ideal number for this dataset (30 books) is between 5 and 15 epochs
 NUM_EPOCHS = 10
 
+DATA_DIR = "03_bonus_pretraining_on_gutenberg/gutenberg_preprocessed"
+IMAGE_FILE = "training_validation_losses.png"
 MODEL_PATH = "../models/gpt_124m/gpt_124m_final.pth"
 
 
-# ==========================================
-# 1. ARCHITECTURE MODULES
-# ==========================================
+# =================
+# GPT Archictecture
+# =================
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_in, d_out, context_length, dropout, num_heads, qkv_bias=False):
@@ -188,9 +187,9 @@ class GPTModel(nn.Module):
         return logits
 
 
-# ==========================================
-# 2. DATA PROCESSING & UTILITIES
-# ==========================================
+# =============================
+# Data processing and utilities
+# =============================
 
 class GPTDatasetV1(Dataset):
     def __init__(self, txt, tokenizer, max_length, stride):
@@ -245,9 +244,9 @@ def token_ids_to_text(token_ids, tokenizer):
     return tokenizer.decode(flat.tolist())
 
 
-# ==========================================
-# 3. TRAINING & EVALUATION FUNCTIONS
-# ==========================================
+# =======================
+# Training and evaluation
+# =======================
 
 def calc_loss_batch(input_batch, target_batch, model, device):
     input_batch = input_batch.to(device)         
@@ -340,122 +339,122 @@ def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
     ax2.set_xlabel("Tokens seen")
     fig.tight_layout()
     plt.savefig(IMAGE_FILE, dpi=300) 
-    print(f"\nPlot saved successfully as {IMAGE_FILE}")
+    print(f"\nPlot saved as {IMAGE_FILE}")
     plt.show()
 
 
-# ==========================================
-# 4. EXECUTION FLOW
-# ==========================================
-
-if __name__ == "__main__":
-    # --- Step A: Quick Toy Data Smoke Test ---
-    inputs = torch.tensor([[16833, 3626, 6100], [40, 1107, 588]])   
-    targets = torch.tensor([[3626, 6100, 345], [1107, 588, 11311]])  
-
-    console = Console()
-    console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
-    tokenizer = tiktoken.get_encoding("gpt2")
-
-    console.print(f"\nInstance TransformerBlock", style="gold1")
-    torch.manual_seed(123)
-    model = GPTModel(GPT_CONFIG_124M)
-
-    with torch.no_grad():                      
-        logits = model(inputs)
-    probas = torch.softmax(logits, dim=-1)     
-    print("Softmax shape:", probas.shape)
-
-    token_ids = torch.argmax(probas, dim=-1, keepdim=True)
-    print("Targets batch 1:", token_ids_to_text(targets[0], tokenizer))
-    print("Outputs batch 1:", token_ids_to_text(token_ids[0].flatten(), tokenizer))
-
-    logits_flat = logits.flatten(0, 1)
-    targets_flat = targets.flatten()
-    loss = torch.nn.functional.cross_entropy(logits_flat, targets_flat)
-    console.print(f"Initial Baseline Loss: {loss:.4f}", style="bright_blue")
+# =========
+# Execution
+# =========
 
 
-    # --- Step B: Load Multi-Book Dataset ---
-    console.print(f"\nReading text files from '{DATA_DIR}'", style="gold1")
-    raw_text = ""
+# --- Step A: Quick Toy Data Smoke Test ---
+inputs = torch.tensor([[16833, 3626, 6100], [40, 1107, 588]])   
+targets = torch.tensor([[3626, 6100, 345], [1107, 588, 11311]])  
 
-    file_paths = sorted(glob.glob(os.path.join(DATA_DIR, "*.txt")))
-    if not file_paths:
-        raise FileNotFoundError(f"No text files found in '{DATA_DIR}'. Did you run prepare_dataset.py?")
+console = Console()
+console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
+tokenizer = tiktoken.get_encoding("gpt2")
 
-    for file_path in file_paths:
-        print(f" -> Loading: {os.path.basename(file_path)}")
-        with open(file_path, "r", encoding="utf-8") as f:
-            raw_text += f.read() + "\n"
+console.print(f"\nInstance TransformerBlock", style="gold1")
+torch.manual_seed(123)
+model = GPTModel(GPT_CONFIG_124M)
 
-    total_characters = len(raw_text)
-    integers = tokenizer.encode(raw_text, allowed_special={"<|endoftext|>"})
-    total_tokens = len(integers)
+with torch.no_grad():                      
+    logits = model(inputs)
+probas = torch.softmax(logits, dim=-1)     
+print("Softmax shape:", probas.shape)
 
-    print(f"\nTotal Dataset Characters: {total_characters:,}")
-    print(f"Total Dataset Tokens: {total_tokens:,}")
+token_ids = torch.argmax(probas, dim=-1, keepdim=True)
+print("Targets batch 1:", token_ids_to_text(targets[0], tokenizer))
+print("Outputs batch 1:", token_ids_to_text(token_ids[0].flatten(), tokenizer))
+
+logits_flat = logits.flatten(0, 1)
+targets_flat = targets.flatten()
+loss = torch.nn.functional.cross_entropy(logits_flat, targets_flat)
+console.print(f"Initial Baseline Loss: {loss:.4f}", style="bright_blue")
 
 
-    # --- Step C: Create Scaled Data Loaders ---
-    train_ratio = 0.90
-    split_idx = int(train_ratio * len(raw_text))
-    train_data = raw_text[:split_idx]
-    val_data = raw_text[split_idx:]
+# Load Multi-Book Dataset
+console.print(f"\nReading text files from '{DATA_DIR}'", style="gold1")
+raw_text = ""
 
-    torch.manual_seed(123)
+file_paths = sorted(glob.glob(os.path.join(DATA_DIR, "*.txt")))
+if not file_paths:
+    raise FileNotFoundError(f"No text files found in '{DATA_DIR}'. Did you run prepare_dataset.py?")
+
+for file_path in file_paths:
+    print(f" -> Loading: {os.path.basename(file_path)}")
+    with open(file_path, "r", encoding="utf-8") as f:
+        raw_text += f.read() + "\n"
+
+total_characters = len(raw_text)
+integers = tokenizer.encode(raw_text, allowed_special={"<|endoftext|>"})
+total_tokens = len(integers)
+
+print(f"\nTotal Dataset Characters: {total_characters:,}")
+print(f"Total Dataset Tokens: {total_tokens:,}")
+
+
+# Create Scaled Data Loaders
+train_ratio = 0.90
+split_idx = int(train_ratio * len(raw_text))
+train_data = raw_text[:split_idx]
+val_data = raw_text[split_idx:]
+
+torch.manual_seed(123)
     
   
 
-    train_loader = create_dataloader_v1(
-        train_data,
-        batch_size=BATCH_SIZE,
-        max_length=GPT_CONFIG_124M["context_length"],
-        stride=GPT_CONFIG_124M["context_length"],
-        drop_last=True,
-        shuffle=True
-    )
-    val_loader = create_dataloader_v1(
-        val_data,
-        batch_size=BATCH_SIZE,
-        max_length=GPT_CONFIG_124M["context_length"],
-        stride=GPT_CONFIG_124M["context_length"],
-        drop_last=False,
-        shuffle=False
-    )
+train_loader = create_dataloader_v1(
+    train_data,
+    batch_size=BATCH_SIZE,
+    max_length=GPT_CONFIG_124M["context_length"],
+    stride=GPT_CONFIG_124M["context_length"],
+    drop_last=True,
+    shuffle=True
+)
+val_loader = create_dataloader_v1(
+    val_data,
+    batch_size=BATCH_SIZE,
+    max_length=GPT_CONFIG_124M["context_length"],
+    stride=GPT_CONFIG_124M["context_length"],
+    drop_last=False,
+    shuffle=False
+)
 
-    # --- Step D: Set Up Processing Engine ---
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if torch.cuda.is_available():
-        console.print(f"\nTraining on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue")
-    else:
-        console.print(f"\nCUDA not available. Training on CPU.", style="gold1")          
+# Set Up Processing Engine
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    console.print(f"\nTraining on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue")
+else:
+    console.print(f"\nCUDA not available. Training on CPU.", style="gold1")          
     
-    model.to(device)                                                       
+model.to(device)                                                       
 
-    with torch.no_grad():                                                  
-        train_loss = calc_loss_loader(train_loader, model, device)         
-        val_loss = calc_loss_loader(val_loader, model, device)
-    print("Initial Untrained Training loss:", train_loss)
-    print("Initial Untrained Validation loss:", val_loss)
+with torch.no_grad():                                                  
+    train_loss = calc_loss_loader(train_loader, model, device)         
+    val_loss = calc_loss_loader(val_loader, model, device)
+print("Initial Untrained Training loss:", train_loss)
+print("Initial Untrained Validation loss:", val_loss)
 
 
-    # --- Step E: Run Pretraining Cycle ---
-    console.print(f"\nStarting Core Training Pipeline...", style="gold1")
-    torch.manual_seed(123)
-    
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
+# Run Pretraining Cycle ---
+console.print(f"\nStarting Core Training Pipeline", style="gold1")
+torch.manual_seed(123)
+optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
 
-    
-    train_losses, val_losses, tokens_seen = train_model_simple(
-        model, train_loader, val_loader, optimizer, device,
-        num_epochs=NUM_EPOCHS, eval_freq=25, eval_iter=5,
-        start_context="Every effort moves you", tokenizer=tokenizer
-    )
+train_losses, val_losses, tokens_seen = train_model_simple(
+    model, train_loader, val_loader, optimizer, device,
+    num_epochs=NUM_EPOCHS, eval_freq=25, eval_iter=5,
+    start_context="Every effort moves you", tokenizer=tokenizer
+)
 
-    # --- Step F: Generate and Metrics Output ---
-    epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
-    plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+# Generate and Metrics Output
+epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
+plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 
-    # Guarda el modelo
-    torch.save(model.state_dict(), MODEL_PATH)
+# Guarda el modelo
+torch.save(model.state_dict(), MODEL_PATH)
+print(f"\nModel saved as {MODEL_PATH}")
+print()
