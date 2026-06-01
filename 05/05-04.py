@@ -432,9 +432,11 @@ else:
     
 model.to(device)                                                       
 
-with torch.no_grad():                                                  
-    train_loss = calc_loss_loader(train_loader, model, device)         
-    val_loss = calc_loss_loader(val_loader, model, device)
+# For sanity check, calculate initial (model with random weights) training and validation loss with a small number of batches
+with torch.no_grad():
+    num_batches = 5    # Small number of batches                                                
+    train_loss = calc_loss_loader(train_loader, model, device, num_batches)         
+    val_loss = calc_loss_loader(val_loader, model, device, num_batches)
 print("Initial Untrained Training loss:", train_loss)
 print("Initial Untrained Validation loss:", val_loss)
 
