@@ -37,8 +37,8 @@ GPT_CONFIG_124M = {
 BATCH_SIZE = 16
 
 # 1 Epoch for large corpus training efficiency
-# 10 Epochs better learning result. The ideal number for this dataset (30 books) is between 5 and 15 epochs
-NUM_EPOCHS = 10
+# 10 Epochs better learning result. The ideal number for this dataset (30 books) is between 5 and 15 epochs. After testing, overtraining starts at 4
+NUM_EPOCHS = 5
 
 DATA_DIR = "03_bonus_pretraining_on_gutenberg/gutenberg_preprocessed"
 IMAGE_FILE = "training_validation_losses.png"
@@ -406,7 +406,7 @@ if __name__ == "__main__":
         train_data,
         batch_size=BATCH_SIZE,
         max_length=GPT_CONFIG_124M["context_length"],
-        stride=GPT_CONFIG_124M["context_length"],
+        stride=GPT_CONFIG_124M["context_length"]//2,
         drop_last=True,
         shuffle=True
     )
@@ -414,7 +414,7 @@ if __name__ == "__main__":
         val_data,
         batch_size=BATCH_SIZE,
         max_length=GPT_CONFIG_124M["context_length"],
-        stride=GPT_CONFIG_124M["context_length"],
+        stride=GPT_CONFIG_124M["context_length"]//2,
         drop_last=False,
         shuffle=False
     )
@@ -440,7 +440,7 @@ if __name__ == "__main__":
     # Run Pretraining Cycle ---
     console.print(f"\nStarting Core Training Pipeline", style="gold1")
     torch.manual_seed(123)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0002, weight_decay=0.1)
 
     train_losses, val_losses, tokens_seen = train_model_simple(
         model, train_loader, val_loader, optimizer, device,
