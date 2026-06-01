@@ -346,117 +346,113 @@ def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
 # =========
 # Execution
 # =========
+if __name__ == "__main__":    
+    # --- Step A: Quick Toy Data Smoke Test ---
+    inputs = torch.tensor([[16833, 3626, 6100], [40, 1107, 588]])   
+    targets = torch.tensor([[3626, 6100, 345], [1107, 588, 11311]])  
 
+    console = Console()
+    console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
+    tokenizer = tiktoken.get_encoding("gpt2")
 
-# --- Step A: Quick Toy Data Smoke Test ---
-inputs = torch.tensor([[16833, 3626, 6100], [40, 1107, 588]])   
-targets = torch.tensor([[3626, 6100, 345], [1107, 588, 11311]])  
+    console.print(f"\nInstance TransformerBlock", style="gold1")
+    torch.manual_seed(123)
+    model = GPTModel(GPT_CONFIG_124M)
 
-console = Console()
-console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
-tokenizer = tiktoken.get_encoding("gpt2")
+    with torch.no_grad():                      
+        logits = model(inputs)
+    probas = torch.softmax(logits, dim=-1)     
+    print("Softmax shape:", probas.shape)
 
-console.print(f"\nInstance TransformerBlock", style="gold1")
-torch.manual_seed(123)
-model = GPTModel(GPT_CONFIG_124M)
+    token_ids = torch.argmax(probas, dim=-1, keepdim=True)
+    print("Targets batch 1:", token_ids_to_text(targets[0], tokenizer))
+    print("Outputs batch 1:", token_ids_to_text(token_ids[0].flatten(), tokenizer))
 
-with torch.no_grad():                      
-    logits = model(inputs)
-probas = torch.softmax(logits, dim=-1)     
-print("Softmax shape:", probas.shape)
+    logits_flat = logits.flatten(0, 1)
+    targets_flat = targets.flatten()
+    loss = torch.nn.functional.cross_entropy(logits_flat, targets_flat)
+    console.print(f"Initial Baseline Loss: {loss:.4f}", style="bright_blue")
 
-token_ids = torch.argmax(probas, dim=-1, keepdim=True)
-print("Targets batch 1:", token_ids_to_text(targets[0], tokenizer))
-print("Outputs batch 1:", token_ids_to_text(token_ids[0].flatten(), tokenizer))
+    # Load Multi-Book Dataset
+    console.print(f"\nReading text files from '{DATA_DIR}'", style="gold1")
+    raw_text = ""
 
-logits_flat = logits.flatten(0, 1)
-targets_flat = targets.flatten()
-loss = torch.nn.functional.cross_entropy(logits_flat, targets_flat)
-console.print(f"Initial Baseline Loss: {loss:.4f}", style="bright_blue")
+    file_paths = sorted(glob.glob(os.path.join(DATA_DIR, "*.txt")))
+    if not file_paths:
+        raise FileNotFoundError(f"No text files found in '{DATA_DIR}'. Did you run prepare_dataset.py?")
 
+    for file_path in file_paths:
+        print(f" -> Loading: {os.path.basename(file_path)}")
+        with open(file_path, "r", encoding="utf-8") as f:
+            raw_text += f.read() + "\n"
 
-# Load Multi-Book Dataset
-console.print(f"\nReading text files from '{DATA_DIR}'", style="gold1")
-raw_text = ""
+    total_characters = len(raw_text)
+    integers = tokenizer.encode(raw_text, allowed_special={"<|endoftext|>"})
+    total_tokens = len(integers)
 
-file_paths = sorted(glob.glob(os.path.join(DATA_DIR, "*.txt")))
-if not file_paths:
-    raise FileNotFoundError(f"No text files found in '{DATA_DIR}'. Did you run prepare_dataset.py?")
+    print(f"\nTotal Dataset Characters: {total_characters:,}")
+    print(f"Total Dataset Tokens: {total_tokens:,}")
 
-for file_path in file_paths:
-    print(f" -> Loading: {os.path.basename(file_path)}")
-    with open(file_path, "r", encoding="utf-8") as f:
-        raw_text += f.read() + "\n"
+    # Create Scaled Data Loaders
+    train_ratio = 0.90
+    split_idx = int(train_ratio * len(raw_text))
+    train_data = raw_text[:split_idx]
+    val_data = raw_text[split_idx:]
 
-total_characters = len(raw_text)
-integers = tokenizer.encode(raw_text, allowed_special={"<|endoftext|>"})
-total_tokens = len(integers)
-
-print(f"\nTotal Dataset Characters: {total_characters:,}")
-print(f"Total Dataset Tokens: {total_tokens:,}")
-
-
-# Create Scaled Data Loaders
-train_ratio = 0.90
-split_idx = int(train_ratio * len(raw_text))
-train_data = raw_text[:split_idx]
-val_data = raw_text[split_idx:]
-
-torch.manual_seed(123)
+    torch.manual_seed(123)
     
   
+    train_loader = create_dataloader_v1(
+        train_data,
+        batch_size=BATCH_SIZE,
+        max_length=GPT_CONFIG_124M["context_length"],
+        stride=GPT_CONFIG_124M["context_length"],
+        drop_last=True,
+        shuffle=True
+    )
+    val_loader = create_dataloader_v1(
+        val_data,
+        batch_size=BATCH_SIZE,
+        max_length=GPT_CONFIG_124M["context_length"],
+        stride=GPT_CONFIG_124M["context_length"],
+        drop_last=False,
+        shuffle=False
+    )
 
-train_loader = create_dataloader_v1(
-    train_data,
-    batch_size=BATCH_SIZE,
-    max_length=GPT_CONFIG_124M["context_length"],
-    stride=GPT_CONFIG_124M["context_length"],
-    drop_last=True,
-    shuffle=True
-)
-val_loader = create_dataloader_v1(
-    val_data,
-    batch_size=BATCH_SIZE,
-    max_length=GPT_CONFIG_124M["context_length"],
-    stride=GPT_CONFIG_124M["context_length"],
-    drop_last=False,
-    shuffle=False
-)
-
-# Set Up Processing Engine
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-if torch.cuda.is_available():
-    console.print(f"\nTraining on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue")
-else:
-    console.print(f"\nCUDA not available. Training on CPU.", style="gold1")          
+    # Set Up Processing Engine
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available():
+        console.print(f"\nTraining on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue")
+    else:
+        console.print(f"\nCUDA not available. Training on CPU.", style="gold1")          
     
-model.to(device)                                                       
+    model.to(device)                                                       
 
-# For sanity check, calculate initial (model with random weights) training and validation loss with a small number of batches
-with torch.no_grad():
-    num_batches = 5    # Small number of batches                                                
-    train_loss = calc_loss_loader(train_loader, model, device, num_batches)         
-    val_loss = calc_loss_loader(val_loader, model, device, num_batches)
-print("Initial Untrained Training loss:", train_loss)
-print("Initial Untrained Validation loss:", val_loss)
+    # For sanity check, calculate initial (model with random weights) training and validation loss with a small number of batches
+    with torch.no_grad():
+        num_batches = 5    # Small number of batches                                                
+        train_loss = calc_loss_loader(train_loader, model, device, num_batches)         
+        val_loss = calc_loss_loader(val_loader, model, device, num_batches)
+    print("Initial Untrained Training loss:", train_loss)
+    print("Initial Untrained Validation loss:", val_loss)
 
 
-# Run Pretraining Cycle ---
-console.print(f"\nStarting Core Training Pipeline", style="gold1")
-torch.manual_seed(123)
-optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
+    # Run Pretraining Cycle ---
+    console.print(f"\nStarting Core Training Pipeline", style="gold1")
+    torch.manual_seed(123)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
 
-train_losses, val_losses, tokens_seen = train_model_simple(
-    model, train_loader, val_loader, optimizer, device,
-    num_epochs=NUM_EPOCHS, eval_freq=25, eval_iter=5,
-    start_context="Every effort moves you", tokenizer=tokenizer
-)
+    train_losses, val_losses, tokens_seen = train_model_simple(
+        model, train_loader, val_loader, optimizer, device,
+        num_epochs=NUM_EPOCHS, eval_freq=25, eval_iter=5,
+        start_context="Every effort moves you", tokenizer=tokenizer
+    )
 
-# Generate and Metrics Output
-epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
-plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+    # Generate and Metrics Output
+    epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
+    plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 
-# Guarda el modelo
-torch.save(model.state_dict(), MODEL_PATH)
-print(f"\nModel saved as {MODEL_PATH}")
-print()
+    # Guarda el modelo
+    torch.save(model.state_dict(), MODEL_PATH)
+    print(f"\nModel saved as {MODEL_PATH}")
+    print()

@@ -18,7 +18,7 @@ else:
 # Carga el modelo
 print(f"\nLoading model {MODEL_PATH}")
 model.to(device)
-model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
 model.eval()
 print("Model loaded\n")
 
