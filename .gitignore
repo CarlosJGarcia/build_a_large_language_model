@@ -12,6 +12,8 @@ __pycache__/
 # VS Code generated
 .vscode
 
+# Modelos
+models/
 
 # Codigo para importar los libros del Gutemberg Project directamente
 05/03_bonus_pretraining_on_gutenberg/gutenberg/
