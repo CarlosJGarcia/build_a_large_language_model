@@ -5,9 +5,11 @@ import torch
 from rich.console import Console
 
 
-from p05_04 import generate_and_print_sample
+from p05_04 import generate_and_print_sample, generate_text_simple, text_to_token_ids, token_ids_to_text
 import tiktoken
+import matplotlib.pyplot as plt
 
+IMAGE_FILE = "temperature.png"
 
 console = Console()
 console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
@@ -44,6 +46,82 @@ start_context="Le jeune homme"
 generate_and_print_sample(model, tokenizer, device, start_context)
 print()
 
-# Pause 0
-# print()
-# key = input("Press ENTER to exit.")
+# llevamos el modelo de vuelta a la CPU
+console.print(f"Loading model on CPU", style="gold1")    
+model.to("cpu")
+model.eval()
+
+start_context="Every effort moves you"
+generate_and_print_sample(model, tokenizer, "cpu", start_context)
+
+token_ids = generate_text_simple(
+    model=model,
+    idx=text_to_token_ids("Every effort moves you", tokenizer),
+    max_new_tokens=25,
+    context_size=GPT_CONFIG_124M["context_length"]
+)
+print("Output text:", token_ids_to_text(token_ids, tokenizer))
+print()
+
+# A very small vocabulary for illustration purposes:
+vocab = { 
+    "closer": 0,
+    "every": 1, 
+    "effort": 2, 
+    "forward": 3,
+    "inches": 4,
+    "moves": 5, 
+    "pizza": 6,
+    "toward": 7,
+    "you": 8,
+} 
+inverse_vocab = {v: k for k, v in vocab.items()}
+next_token_logits = torch.tensor([4.51, 0.89, -1.90, 6.75, 1.63, -1.62, -1.89, 6.28, 1.79])
+
+# We convert the logits into probabilities via the softmax function
+probas = torch.softmax(next_token_logits, dim=0)
+
+# We obtain the token ID corresponding to the generated token via the argmax function
+next_token_id = torch.argmax(probas).item()
+print("Inverse vocabulary:", inverse_vocab[next_token_id])
+
+# Replace argmax with the PyTorch multinomial function
+torch.manual_seed(123) 
+next_token_id = torch.multinomial(probas, num_samples=1).item()
+print("Inverse vocabulary:", inverse_vocab[next_token_id])
+print()
+
+# A function that repeats this sampling 1000 times
+def print_sampled_tokens(probas):
+    torch.manual_seed(123)
+    sample = [torch.multinomial(probas, num_samples=1).item()
+             for i in range(1_000)]
+    sampled_ids = torch.bincount(torch.tensor(sample))
+    for i, freq in enumerate(sampled_ids):
+        print(f"{freq} x {inverse_vocab[i]}")
+
+print_sampled_tokens(probas)
+print()
+
+# Temperature scaling
+def softmax_with_temperature(logits, temperature):
+    scaled_logits = logits / temperature
+    return torch.softmax(scaled_logits, dim=0)
+
+temperatures = [1, 0.1, 5]                                     #1
+scaled_probas = [softmax_with_temperature(next_token_logits, T)
+                for T in temperatures]
+x = torch.arange(len(vocab))
+bar_width = 0.15
+fig, ax = plt.subplots(figsize=(5, 3))
+for i, T in enumerate(temperatures):
+    rects = ax.bar(x + i * bar_width, scaled_probas[i], 
+                   bar_width, label=f'Temperature = {T}')
+ax.set_ylabel('Probability')
+ax.set_xticks(x)
+ax.set_xticklabels(vocab.keys(), rotation=90)
+ax.legend()
+plt.tight_layout()
+plt.savefig(IMAGE_FILE, dpi=300) 
+print(f"\nPlot saved as {IMAGE_FILE}")
+plt.show()
