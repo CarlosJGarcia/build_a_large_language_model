@@ -7,7 +7,8 @@ conda install -c conda-forge tiktoken \
 conda install -c conda-forge rich \
 pip install datasets \
 conda install -c conda-forge lxml -y \
-conda install -c conda-forge nltk -y
+conda install -c conda-forge nltk -y \
+pip install "tensorflow[and-cuda]"
 
 
 **Importante:** \
