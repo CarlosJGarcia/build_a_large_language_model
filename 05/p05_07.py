@@ -8,6 +8,8 @@ import torch
 import tiktoken
 from rich.console import Console
 
+from p05_04 import text_to_token_ids, token_ids_to_text
+
 # A text generation function with more diversity
 def generate(model, idx, max_new_tokens, context_size,
              temperature=0.0, top_k=None, eos_id=None):
@@ -69,9 +71,13 @@ model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=T
 model.eval()
 print("Model loaded\n")
 
-
 start_context="Every effort moves you"
 generate_and_print_sample(model, tokenizer, device, start_context)
+
+# llevamos el modelo de vuelta a la CPU
+console.print(f"Loading model on CPU", style="gold1")    
+model.to("cpu")
+model.eval()
 print()
 
 """
@@ -86,10 +92,7 @@ start_context="Le jeune homme"
 generate_and_print_sample(model, tokenizer, device, start_context)
 print()
 
-# llevamos el modelo de vuelta a la CPU
-console.print(f"Loading model on CPU", style="gold1")    
-model.to("cpu")
-model.eval()
+
 
 start_context="Every effort moves you"
 generate_and_print_sample(model, tokenizer, "cpu", start_context)
@@ -191,5 +194,18 @@ print("New logits:", new_logits)
 # Apply the softmax function to turn the new logits into next-token probabilities
 topk_probas = torch.softmax(new_logits, dim=0)
 print("Next-token probabilities:", topk_probas)
+print()
+
+# Use the new generate() function
+torch.manual_seed(123)
+token_ids = generate(
+    model=model,
+    idx=text_to_token_ids("Every effort moves you", tokenizer),
+    max_new_tokens=15,
+    context_size=GPT_CONFIG_124M["context_length"],
+    top_k=25,
+    temperature=1.4
+)
+print("Output text:", token_ids_to_text(token_ids, tokenizer))
 print()
 
