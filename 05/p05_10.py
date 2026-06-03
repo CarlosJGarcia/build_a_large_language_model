@@ -1,11 +1,46 @@
-from p05_04 import GPTModel, generate_and_print_sample
+from p05_04 import GPTModel, generate_and_print_sample, text_to_token_ids, token_ids_to_text
 from p05_04 import GPT_CONFIG_124M
 
-# from gpt_download import download_and_load_gpt2
+
+
+from gpt_download import download_and_load_gpt2
 
 import torch
+import tiktoken
 import numpy as np
 from rich.console import Console
+
+# A text generation function with more diversity
+def generate(model, idx, max_new_tokens, context_size,
+             temperature=0.0, top_k=None, eos_id=None):
+    for _ in range(max_new_tokens):            #1
+        idx_cond = idx[:, -context_size:]
+        with torch.no_grad():
+            logits = model(idx_cond)
+        logits = logits[:, -1, :]
+        if top_k is not None:                #2
+            top_logits, _ = torch.topk(logits, top_k)
+            min_val = top_logits[:, -1]
+            logits = torch.where(
+                logits < min_val,
+                torch.tensor(float('-inf')).to(logits.device),
+                logits
+            )
+        if temperature > 0.0:                  #3
+            logits = logits / temperature
+            probs = torch.softmax(logits, dim=-1)
+            idx_next = torch.multinomial(probs, num_samples=1)
+        else:    #4
+            idx_next = torch.argmax(logits, dim=-1, keepdim=True)
+        if idx_next == eos_id:              #5
+            break
+        idx = torch.cat((idx, idx_next), dim=1)
+    return idx
+#1 The for loop is the same as before: gets logits and only focuses on the last time step.
+#2 Filters logits with top_k sampling
+#3 Applies temperature scaling
+#4 Carries out greedy next-token selection as before when temperature scaling is disabled
+#5 Stops generating early if end-of-sequence token is encountered
 
 # Utility function that checks whether two tensors or arrays (left and right) have the same dimensions or shape and returns the right tensor as trainable PyTorch parameters
 def assign(left, right):
@@ -99,6 +134,10 @@ NEW_CONFIG.update({"context_length": 1024})
 
 NEW_CONFIG.update({"qkv_bias": True})
 
+console = Console()
+console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
+tokenizer = tiktoken.get_encoding("gpt2")
+
 # Descarga
 settings, params = download_and_load_gpt2(model_size="124M", models_dir="gpt2")
 
@@ -107,7 +146,6 @@ model.eval()
 
 # Set Up Processing Engine
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-console = Console()
 if torch.cuda.is_available():
     console.print(f"Loading model on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
 else:
@@ -116,5 +154,14 @@ else:
 load_weights_into_gpt(model, params)
 model.to(device)
 
-
-print("Todo bien")
+# generate new text using our previous generate function:
+torch.manual_seed(123)
+token_ids = generate(
+    model=model,
+    idx=text_to_token_ids("Every effort moves you", tokenizer).to(device),
+    max_new_tokens=25,
+    context_size=NEW_CONFIG["context_length"],
+    top_k=50,
+    temperature=1.5
+)
+print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
