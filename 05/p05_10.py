@@ -12,6 +12,21 @@ import tiktoken
 import numpy as np
 from rich.console import Console
 
+# Dictionary that lists the differences between the different GPT model sizes
+model_configs = {
+    "gpt2-small (124M)": {"emb_dim": 768, "n_layers": 12, "n_heads": 12},
+    "gpt2-medium (355M)": {"emb_dim": 1024, "n_layers": 24, "n_heads": 16},
+    "gpt2-large (774M)": {"emb_dim": 1280, "n_layers": 36, "n_heads": 20},
+    "gpt2-xl (1558M)": {"emb_dim": 1600, "n_layers": 48, "n_heads": 25},
+}
+
+model_name = "gpt2-small (124M)"
+NEW_CONFIG = GPT_CONFIG_124M.copy()
+NEW_CONFIG.update(model_configs[model_name])
+NEW_CONFIG.update({"context_length": 1024})
+NEW_CONFIG.update({"qkv_bias": True})
+MODEL_DIR = "../models/gpt2"
+
 # A text generation function with more diversity
 def generate(model, idx, max_new_tokens, context_size,
              temperature=0.0, top_k=None, eos_id=None):
@@ -118,30 +133,16 @@ def load_weights_into_gpt(gpt, params):                                         
 #4 The original GPT-2 model by OpenAI reused the token embedding weights in the output layer to reduce the total number of parameters, which is a concept known as weight tying.
 
 
-
-
-# Dictionary that lists the differences between the different GPT model sizes
-model_configs = {
-    "gpt2-small (124M)": {"emb_dim": 768, "n_layers": 12, "n_heads": 12},
-    "gpt2-medium (355M)": {"emb_dim": 1024, "n_layers": 24, "n_heads": 16},
-    "gpt2-large (774M)": {"emb_dim": 1280, "n_layers": 36, "n_heads": 20},
-    "gpt2-xl (1558M)": {"emb_dim": 1600, "n_layers": 48, "n_heads": 25},
-}
-
-model_name = "gpt2-small (124M)"
-NEW_CONFIG = GPT_CONFIG_124M.copy()
-NEW_CONFIG.update(model_configs[model_name])
-
-NEW_CONFIG.update({"context_length": 1024})
-
-NEW_CONFIG.update({"qkv_bias": True})
+# =========
+# Execution
+# =========
 
 console = Console()
 console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
 
-# Descarga
-settings, params = download_and_load_gpt2(model_size="124M", models_dir="gpt2")
+# Descarga en la carpeta "gpt2"
+settings, params = download_and_load_gpt2(model_size="124M", models_dir=MODEL_DIR)
 
 model = GPTModel(NEW_CONFIG)
 model.eval()
