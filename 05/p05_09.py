@@ -8,7 +8,7 @@ settings, params = download_and_load_gpt2(model_size="124M", models_dir="gpt2")
 
 print()
 print("Settings:", settings)
-print("Parameter dictionary keys:", params.keys())
+print("Params:", params.keys())
 
 print()
 print(params["wte"])

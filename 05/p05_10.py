@@ -1,6 +1,8 @@
+# Download a pretrained GPT-2 model from OpenAI 
+# Reinach 04/Jun/2026
+
 from p05_04 import GPTModel, generate_and_print_sample, text_to_token_ids, token_ids_to_text
 from p05_04 import GPT_CONFIG_124M
-
 
 
 from gpt_download import download_and_load_gpt2

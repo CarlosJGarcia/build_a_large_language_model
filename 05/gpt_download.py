@@ -3,11 +3,9 @@
 #   - https://www.manning.com/books/build-a-large-language-model-from-scratch
 # Code: https://github.com/rasbt/LLMs-from-scratch
 
-
 import os
-
-import requests
 import json
+import requests
 import numpy as np
 import tensorflow as tf
 from tqdm import tqdm
@@ -21,8 +19,8 @@ def download_and_load_gpt2(model_size, models_dir):
 
     # Define paths
     model_dir = os.path.join(models_dir, model_size)
-    base_url = "https://openaipublic.blob.core.windows.net/gpt-2/models"
-    backup_base_url = "https://f001.backblazeb2.com/file/LLMs-from-scratch/gpt2"
+    base_url = "https://openaipublic.blob.core.windows.net/gpt-2/models"                # OpenAI server hosted in MS Azure
+    backup_base_url = "https://f001.backblazeb2.com/file/LLMs-from-scratch/gpt2"        # Mirror en Blackbaze (Empresa de Cloud BLOB Storage y Backup)
     filenames = [
         "checkpoint", "encoder.json", "hparams.json",
         "model.ckpt.data-00000-of-00001", "model.ckpt.index",
