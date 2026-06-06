@@ -9,3 +9,7 @@ df = pd.read_csv(data_file_path, sep="\t", header=None, names=["Label", "Text"])
 print("Dataframe:")
 print(df)
 print()
+
+# Veces que aparece ham/spam
+print(df["Label"].value_counts())
+print()
