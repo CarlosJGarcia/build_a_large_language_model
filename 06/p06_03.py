@@ -1,9 +1,21 @@
+import os
+import sys
+
 import torch
 import tiktoken
 import pandas as pd
 from pathlib import Path
 from rich.console import Console
 from torch.utils.data import Dataset, DataLoader
+
+# Point Python to the folder one level up, named '05' so "from p05_04 import GPTModel" works
+import_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../05'))
+if import_dir not in sys.path:
+    sys.path.insert(0, import_dir)
+from gpt_download import download_and_load_gpt2
+from p05_04 import GPTModel
+from p05_10 import load_weights_into_gpt
+
 
 # Dictionary that lists the differences between the different GPT model sizes
 model_configs = {
@@ -110,4 +122,16 @@ print()
 print(f"{len(train_loader)} training batches")
 print(f"{len(val_loader)} validation batches")
 print(f"{len(test_loader)} test batches")
+print()
+
+
+MODEL_DIR = "../models/gpt2"
+
+# Descarga en la carpeta "gpt2"
+model_size = CHOOSE_MODEL.split(" ")[-1].lstrip("(").rstrip(")")
+settings, params = download_and_load_gpt2(model_size=model_size, models_dir=MODEL_DIR)
+
+model = GPTModel(BASE_CONFIG)
+load_weights_into_gpt(model, params)
+model.eval()
 print()

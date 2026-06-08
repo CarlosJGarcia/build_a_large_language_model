@@ -136,35 +136,35 @@ def load_weights_into_gpt(gpt, params):                                         
 # =========
 # Execution
 # =========
+if __name__ == "__main__":  
+    console = Console()
+    console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
+    tokenizer = tiktoken.get_encoding("gpt2")
 
-console = Console()
-console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
-tokenizer = tiktoken.get_encoding("gpt2")
+    # Descarga en la carpeta "gpt2"
+    settings, params = download_and_load_gpt2(model_size="124M", models_dir=MODEL_DIR)
 
-# Descarga en la carpeta "gpt2"
-settings, params = download_and_load_gpt2(model_size="124M", models_dir=MODEL_DIR)
+    model = GPTModel(NEW_CONFIG)
+    model.eval()
 
-model = GPTModel(NEW_CONFIG)
-model.eval()
+    # Set Up Processing Engine
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available():
+        console.print(f"Loading model on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
+    else:
+        console.print(f"CUDA not available. Loading model on CPU.", style="gold1") 
 
-# Set Up Processing Engine
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-if torch.cuda.is_available():
-    console.print(f"Loading model on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
-else:
-    console.print(f"CUDA not available. Loading model on CPU.", style="gold1") 
+    load_weights_into_gpt(model, params)
+    model.to(device)
 
-load_weights_into_gpt(model, params)
-model.to(device)
-
-# generate new text using our previous generate function:
-torch.manual_seed(123)
-token_ids = generate(
-    model=model,
-    idx=text_to_token_ids("Every effort moves you", tokenizer).to(device),
-    max_new_tokens=25,
-    context_size=NEW_CONFIG["context_length"],
-    top_k=50,
-    temperature=1.5
-)
-print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
+    # generate new text using our previous generate function:
+    torch.manual_seed(123)
+    token_ids = generate(
+        model=model,
+        idx=text_to_token_ids("Every effort moves you", tokenizer).to(device),
+        max_new_tokens=25,
+        context_size=NEW_CONFIG["context_length"],
+        top_k=50,
+        temperature=1.5
+    )
+    print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
