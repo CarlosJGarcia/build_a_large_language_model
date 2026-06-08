@@ -13,7 +13,7 @@ import_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../05'))
 if import_dir not in sys.path:
     sys.path.insert(0, import_dir)
 from gpt_download import download_and_load_gpt2
-from p05_04 import GPTModel
+from p05_04 import GPTModel, generate_text_simple, text_to_token_ids, token_ids_to_text
 from p05_10 import load_weights_into_gpt
 
 
@@ -135,3 +135,30 @@ model = GPTModel(BASE_CONFIG)
 load_weights_into_gpt(model, params)
 model.eval()
 print()
+
+# Ensure that the model generates coherent text
+console.print(f"Chack that the model generates coherent text", style="gold1")
+text_1 = "Every effort moves you"
+token_ids = generate_text_simple(
+    model=model,
+    idx=text_to_token_ids(text_1, tokenizer),
+    max_new_tokens=15,
+    context_size=BASE_CONFIG["context_length"]
+)
+print(token_ids_to_text(token_ids, tokenizer))
+print()
+
+# Before fine-tunning, check whether the model already classifies spam messages
+console.print(f"Chack if, before fine-tunning, can classify spam", style="gold1")
+text_2 = (
+    "Is the following text 'spam'? Answer with 'yes' or 'no':"
+    " 'You are a winner you have been specially"
+    " selected to receive $1000 cash or a $2000 award.'"
+)
+token_ids = generate_text_simple(
+    model=model,
+    idx=text_to_token_ids(text_2, tokenizer),
+    max_new_tokens=23,
+    context_size=BASE_CONFIG["context_length"]
+)
+print(token_ids_to_text(token_ids, tokenizer))
