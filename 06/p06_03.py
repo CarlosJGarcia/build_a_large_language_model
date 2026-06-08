@@ -137,7 +137,7 @@ model.eval()
 print()
 
 # Ensure that the model generates coherent text
-console.print(f"Chack that the model generates coherent text", style="gold1")
+console.print(f"Check that the model generates coherent text", style="gold1")
 text_1 = "Every effort moves you"
 token_ids = generate_text_simple(
     model=model,
@@ -162,3 +162,25 @@ token_ids = generate_text_simple(
     context_size=BASE_CONFIG["context_length"]
 )
 print(token_ids_to_text(token_ids, tokenizer))
+
+#Show the model's architecture
+console.print(f"\nModel architecture", style="gold1")
+print(model)
+
+# Freeze the model: make all layers nontrainable (requires_grad = False)
+for param in model.parameters():
+    param.requires_grad = False
+
+# Add a classification layer
+torch.manual_seed(123)
+num_classes = 2
+model.out_head = torch.nn.Linear(
+    in_features=BASE_CONFIG["emb_dim"], 
+    out_features=num_classes
+)
+
+# Make the LayerNorm and last transformer block trainable (requires_grad = True)
+for param in model.trf_blocks[-1].parameters():
+    param.requires_grad = True
+for param in model.final_norm.parameters():
+    param.requires_grad = True
