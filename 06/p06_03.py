@@ -92,6 +92,36 @@ class SpamDataset(Dataset):
                 max_length = encoded_length
         return max_length
 
+
+# Calculating the classification accuracy
+def calc_accuracy_loader(data_loader, model, device, num_batches=None):
+    model.eval()
+    correct_predictions, num_examples = 0, 0
+
+    if num_batches is None:
+        num_batches = len(data_loader)
+    else:
+        num_batches = min(num_batches, len(data_loader))
+    for i, (input_batch, target_batch) in enumerate(data_loader):
+        if i < num_batches:
+            input_batch = input_batch.to(device)
+            target_batch = target_batch.to(device)
+
+
+            with torch.no_grad():
+                logits = model(input_batch)[:, -1, :]              # Logits of last output token1
+            predicted_labels = torch.argmax(logits, dim=-1)
+
+            num_examples += predicted_labels.shape[0]
+            correct_predictions += (
+                (predicted_labels == target_batch).sum().item()
+            )
+
+        else:
+            break
+    return correct_predictions / num_examples
+
+
 console = Console()
 console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
@@ -215,3 +245,27 @@ print("Class label (probas):", label.item())
 logits = outputs[:, -1, :]
 label = torch.argmax(logits)
 print("Class label (logits):", label.item())
+
+# Determine the classification accuracies across various datasets estimated from 10 batches for efficiency:
+console.print(f"\nDetermine the classification accuracies", style="gold1")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+        console.print(f"Loading model on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
+else:
+        console.print(f"CUDA not available. Loading model on CPU.", style="gold1") 
+model.to(device)
+
+torch.manual_seed(123)
+train_accuracy = calc_accuracy_loader(
+    train_loader, model, device, num_batches=10
+)
+val_accuracy = calc_accuracy_loader(
+    val_loader, model, device, num_batches=10
+)
+test_accuracy = calc_accuracy_loader(
+    test_loader, model, device, num_batches=10
+)
+
+print(f"Training accuracy: {train_accuracy*100:.2f}%")
+print(f"Validation accuracy: {val_accuracy*100:.2f}%")
+print(f"Test accuracy: {test_accuracy*100:.2f}%")
