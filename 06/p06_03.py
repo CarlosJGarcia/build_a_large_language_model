@@ -184,3 +184,34 @@ for param in model.trf_blocks[-1].parameters():
     param.requires_grad = True
 for param in model.final_norm.parameters():
     param.requires_grad = True
+
+# Ensure that the model keeps being able to generates coherent text
+console.print(f"\nCheck that the model keeps being able to generate coherent text", style="gold1")
+text_1 = "Every effort moves you"
+token_ids = generate_text_simple(
+    model=model,
+    idx=text_to_token_ids(text_1, tokenizer),
+    max_new_tokens=15,
+    context_size=BASE_CONFIG["context_length"]
+)
+print(token_ids_to_text(token_ids, tokenizer))
+print()
+
+inputs = tokenizer.encode("Do you have time")
+inputs = torch.tensor(inputs).unsqueeze(0)
+print("Inputs:", inputs)
+print("Inputs dimensions:", inputs.shape)    # shape: (batch_size, num_tokens)
+
+with torch.no_grad():
+    outputs = model(inputs)
+print("Outputs:\n", outputs)
+print("Outputs dimensions:", outputs.shape)
+print("Last output token:", outputs[:, -1, :])
+
+probas = torch.softmax(outputs[:, -1, :], dim=-1)
+label = torch.argmax(probas)
+print("Class label (probas):", label.item())
+
+logits = outputs[:, -1, :]
+label = torch.argmax(logits)
+print("Class label (logits):", label.item())
