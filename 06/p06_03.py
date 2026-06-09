@@ -6,8 +6,10 @@ import torch
 import tiktoken
 import pandas as pd
 from pathlib import Path
+import matplotlib.pyplot as plt
 from rich.console import Console
 from torch.utils.data import Dataset, DataLoader
+
 
 # Point Python to the folder one level up, named '05' so "from p05_04 import GPTModel" works
 import_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../05'))
@@ -50,6 +52,9 @@ test_file_path = Path(DATA_PATH) / "test.csv"
 
 # Number of fine-tunning (training) epochs
 NUM_EPOCHS = 5
+
+VALIDATION_IMAGE_FILE = "training_validation_losses.png"
+ACCURACY_IMAGE_FILE = "accuracy.png"
 
 class SpamDataset(Dataset):
     def __init__(self, csv_file, tokenizer, max_length=None,
@@ -191,7 +196,7 @@ def train_classifier_simple(
                     model, train_loader, val_loader, device, eval_iter)
                 train_losses.append(train_loss)
                 val_losses.append(val_loss)
-                print(f"Ep {epoch+1} (Step {global_step:06d}): "
+                print(f"Epoch {epoch+1} (Step {global_step:06d}): "
                       f"Train loss {train_loss:.3f}, "
                       f"Val loss {val_loss:.3f}"
                 )
@@ -206,6 +211,32 @@ def train_classifier_simple(
 
     return train_losses, val_losses, train_accs, val_accs, examples_seen
 
+
+def plot_values(
+        epochs_seen, examples_seen, train_values, val_values,
+        label="loss", filename="default.png"):
+    fig, ax1 = plt.subplots(figsize=(5, 3))                           #1
+    ax1.plot(epochs_seen, train_values, label=f"Training {label}")
+    ax1.plot(
+        epochs_seen, val_values, linestyle="-.",
+        label=f"Validation {label}"
+    )
+    ax1.set_xlabel("Epochs")
+    ax1.set_ylabel(label.capitalize())
+    ax1.legend()                                                      #2
+    ax2 = ax1.twiny()
+    ax2.plot(examples_seen, train_values, alpha=0)                    #3
+    ax2.set_xlabel("Examples seen")
+    fig.tight_layout()                                                #4
+    #plt.savefig(f"{label}-plot.pdf")
+    plt.savefig(filename, dpi=300) 
+    print(f"Plot saved as {filename}")
+    plt.show()
+    plt.show()
+#1 Plots training and validation loss against epochs
+#2 Creates a second x-axis for examples seen
+#3 Invisible plot for aligning ticks
+#4 Adjusts layout to make room
 
 
 console = Console()
@@ -388,3 +419,15 @@ train_losses, val_losses, train_accs, val_accs, examples_seen = \
 end_time = time.time()
 execution_time_minutes = (end_time - start_time) / 60
 print(f"Training completed in {execution_time_minutes:.2f} minutes.")
+print()
+
+# Plotting the classification loss
+epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
+examples_seen_tensor = torch.linspace(0, examples_seen, len(train_losses))
+plot_values(epochs_tensor, examples_seen_tensor, train_losses, val_losses, filename=VALIDATION_IMAGE_FILE)
+
+# Plot the classification accuracies
+epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_accs))
+examples_seen_tensor = torch.linspace(0, examples_seen, len(train_accs))
+plot_values(epochs_tensor, examples_seen_tensor, train_accs, val_accs, label="accuracy", filename=ACCURACY_IMAGE_FILE)
+print()
