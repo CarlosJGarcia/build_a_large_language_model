@@ -239,6 +239,38 @@ def plot_values(
 #4 Adjusts layout to make room
 
 
+def classify_review(
+        text, model, tokenizer, device, max_length=None,
+        pad_token_id=50256):
+    model.eval()
+
+    input_ids = tokenizer.encode(text)                                #1
+    supported_context_length = model.pos_emb.weight.shape[0]
+
+    input_ids = input_ids[:min(                                       #2
+        max_length, supported_context_length
+    )]
+
+    input_ids += [pad_token_id] * (max_length - len(input_ids))       #3
+
+    input_tensor = torch.tensor(
+        input_ids, device=device
+    ).unsqueeze(0)                                                    #4
+
+    with torch.no_grad():                                             #5
+        logits = model(input_tensor)[:, -1, :]                        #6
+    predicted_label = torch.argmax(logits, dim=-1).item()
+
+    return "spam" if predicted_label == 1 else "not spam"             #7
+#1 Prepares inputs to the model
+#2 Truncates sequences if they are too long
+#3 Pads sequences to the longest sequence
+#4 Adds batch dimension
+#5 Models inference without gradient tracking
+#6 Logits of the last output token
+#7 Returns the classified result
+
+
 console = Console()
 console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
@@ -364,7 +396,7 @@ label = torch.argmax(logits)
 print("Class label (logits):", label.item())
 
 # Determine the classification accuracies across various datasets estimated from 10 batches for efficiency:
-console.print(f"\nDetermine the classification accuracies", style="gold1")
+console.print(f"\nDetermine the classification accuracy", style="gold1")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if torch.cuda.is_available():
         console.print(f"Loading model on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
@@ -431,3 +463,17 @@ epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_accs))
 examples_seen_tensor = torch.linspace(0, examples_seen, len(train_accs))
 plot_values(epochs_tensor, examples_seen_tensor, train_accs, val_accs, label="accuracy", filename=ACCURACY_IMAGE_FILE)
 print()
+
+# Calculate the performance metrics for training, validation, and test sets across the entire dataset
+train_accuracy = calc_accuracy_loader(train_loader, model, device)
+val_accuracy = calc_accuracy_loader(val_loader, model, device)
+test_accuracy = calc_accuracy_loader(test_loader, model, device)
+
+print(f"Training accuracy: {train_accuracy*100:.2f}%")
+print(f"Validation accuracy: {val_accuracy*100:.2f}%")
+print(f"Test accuracy: {test_accuracy*100:.2f}%")
+
+
+# Test the classify_review function
+text_1 = "You are a winner you have been specially selected to receive $1000 cash or a $2000 award."
+print(classify_review(text_1, model, tokenizer, device, max_length=train_dataset.max_length))
