@@ -7,7 +7,7 @@
 | 3. Coding attention mechanisms (Attention) | Completed | 25/May/2026 | Masked multi-head attention |
 | 4. Implementing a GPT model from scratch to generate text | Completed | 27/May/2026 | LLM GPT Architecture |
 | 5. Pretraining on unlabeled data | Completed | 04/Jun/2026 | Pretraining |
-| 6. Fine-tunning for classification | Not Started | - | - |
+| 6. Fine-tunning for classification | Completed | 10/Jun/2026 | Training - classification |
 | 7. Fine-tunning to follow instructions | Not Started | - | - |
 | Appendix A. Introduction to PyTorch | In Progress | - | - |
 | Appendix B. References and further reading | Not Started | - | - |
