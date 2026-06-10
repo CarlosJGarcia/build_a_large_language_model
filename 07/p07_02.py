@@ -39,7 +39,7 @@ class InstructionDataset(Dataset):
         return len(self.data)
 
 
-# Collate function to implement the padding process
+# Collate function to implement the padding process (draft #1)
 def custom_collate_draft_1(
     batch,
     pad_token_id=50256,
@@ -67,7 +67,7 @@ def custom_collate_draft_1(
 #3 Removes extra padded token added earlier
 #4 Converts the list of inputs to a tensor and transfers it to the target device
 
-# Updated collate function
+# Updated collate function (draft #2)
 def custom_collate_draft_2(
     batch,
     pad_token_id=50256,
@@ -92,6 +92,52 @@ def custom_collate_draft_2(
     inputs_tensor = torch.stack(inputs_lst).to(device)
     targets_tensor = torch.stack(targets_lst).to(device)
     return inputs_tensor, targets_tensor
+
+
+# Collate function (versión definitiva)
+def custom_collate_fn(
+    batch,
+    pad_token_id=50256,
+    ignore_index=-100,
+    allowed_max_length=None,
+    device="cpu"
+):
+    batch_max_length = max(len(item)+1 for item in batch)
+    inputs_lst, targets_lst = [], []
+
+    for item in batch:
+        new_item = item.copy()
+        new_item += [pad_token_id]
+
+
+        padded = (                                    #1
+            new_item + [pad_token_id] *          
+            (batch_max_length - len(new_item))   
+        )
+        inputs = torch.tensor(padded[:-1])            #2
+        targets = torch.tensor(padded[1:])            #3
+
+        mask = targets == pad_token_id                #4
+        indices = torch.nonzero(mask).squeeze()     
+        if indices.numel() > 1:                     
+            targets[indices[1:]] = ignore_index     
+
+        if allowed_max_length is not None:
+            inputs = inputs[:allowed_max_length]       #5
+            targets = targets[:allowed_max_length]  
+
+        inputs_lst.append(inputs)
+        targets_lst.append(targets)
+
+    inputs_tensor = torch.stack(inputs_lst).to(device)
+    targets_tensor = torch.stack(targets_lst).to(device)
+    return inputs_tensor, targets_tensor
+#1 Pads sequences to max_length
+#2 Truncates the last token for inputs
+#3 Shifts +1 to the right for targets
+#4 Replaces all but the first padding tokens in targets by ignore_index
+#5 Optionally truncates to the maximum sequence length
+
 
 # Open the file and load its contents into the 'data' variable
 with open(FILE_PATH, "r", encoding="utf-8") as f:
@@ -156,4 +202,42 @@ console.print(f"---\n", style="gold1")
 inputs, targets = custom_collate_draft_2(batch)
 print(inputs)
 print(targets)
+
+
+
+# Test the definitive collate function
+inputs, targets = custom_collate_fn(batch)
+print(inputs)
+print(targets)
+
+console.print(f"---\n", style="gold1")
+
+logits_1 = torch.tensor(
+    [[-1.0, 1.0],                   # Predictions for 1st Token
+     [-0.5, 1.5]]                   # Predictions for 2nd Token
+)
+targets_1 = torch.tensor([0, 1])    # Correct token indices to generate
+loss_1 = torch.nn.functional.cross_entropy(logits_1, targets_1)
+print("Loss value: ", loss_1)
+print()
+
+console.print(f"---\n", style="gold1")
+
+logits_2 = torch.tensor(
+    [[-1.0, 1.0],
+     [-0.5, 1.5],
+     [-0.5, 1.5]]                    # New third token ID prediction
+)
+targets_2 = torch.tensor([0, 1, 1])
+loss_2 = torch.nn.functional.cross_entropy(logits_2, targets_2)
+print("Loss value: ", loss_2)
+print()
+
+console.print(f"---\n", style="gold1")
+
+# Replace the third target token ID with -100:
+targets_3 = torch.tensor([0, 1, -100])
+loss_3 = torch.nn.functional.cross_entropy(logits_2, targets_3)
+print("Loss value: ",loss_3)
+print("loss_1 == loss_3:", loss_1 == loss_3)
 print()
