@@ -486,14 +486,30 @@ print(classify_review(text_1, model, tokenizer, device, max_length=train_dataset
 console.print(f"\nTest classification:", style="gold1")
 text_1 = "Hey, just wanted to check if we're still on for dinner tonight? Let me know!"
 print(classify_review(text_1, model, tokenizer, device, max_length=train_dataset.max_length))
-
-
+print()
 
 # Guarda el modelo
 torch.save(model.state_dict(), MODEL_PATH)
-print(f"\nModel saved as {MODEL_PATH}")
-print()
+print(f"Model saved as {MODEL_PATH}\n")
 
 # Cargo el modelo de nuevo
+print(f"Loading model {MODEL_PATH}")
+if torch.cuda.is_available():
+        console.print(f"Using GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
+else:
+        console.print(f"CUDA not available. Using CPU.", style="gold1") 
 model_state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=True)
 model.load_state_dict(model_state_dict)
+model.eval()
+print("Model loaded\n")
+
+# Final test
+console.print(f"Test classification:", style="gold1")
+text_1 = "When you are done training and want to use your model, you should almost always use this standard two-step pattern."
+print(classify_review(text_1, model, tokenizer, device, max_length=train_dataset.max_length))
+print()
+
+# Pause 0
+key = input("Press ENTER to exit.")
+print()
+
