@@ -56,6 +56,9 @@ NUM_EPOCHS = 5
 VALIDATION_IMAGE_FILE = "training_validation_losses.png"
 ACCURACY_IMAGE_FILE = "accuracy.png"
 
+MODEL_DIR = "../models/gpt2"
+MODEL_PATH = "../models/06-03-review_classifier.pth"
+
 class SpamDataset(Dataset):
     def __init__(self, csv_file, tokenizer, max_length=None,
                  pad_token_id=50256):
@@ -304,7 +307,7 @@ print(f"{len(test_loader)} test batches")
 print()
 
 
-MODEL_DIR = "../models/gpt2"
+
 
 # Descarga en la carpeta "gpt2"
 model_size = CHOOSE_MODEL.split(" ")[-1].lstrip("(").rstrip(")")
@@ -474,6 +477,23 @@ print(f"Validation accuracy: {val_accuracy*100:.2f}%")
 print(f"Test accuracy: {test_accuracy*100:.2f}%")
 
 
-# Test the classify_review function
+# Test the classify_review function on a sample text
+console.print(f"\nTest classification:", style="gold1")
 text_1 = "You are a winner you have been specially selected to receive $1000 cash or a $2000 award."
 print(classify_review(text_1, model, tokenizer, device, max_length=train_dataset.max_length))
+
+# Another test
+console.print(f"\nTest classification:", style="gold1")
+text_1 = "Hey, just wanted to check if we're still on for dinner tonight? Let me know!"
+print(classify_review(text_1, model, tokenizer, device, max_length=train_dataset.max_length))
+
+
+
+# Guarda el modelo
+torch.save(model.state_dict(), MODEL_PATH)
+print(f"\nModel saved as {MODEL_PATH}")
+print()
+
+# Cargo el modelo de nuevo
+model_state_dict = torch.load(MODEL_PATH, map_location=device, weights_only=True)
+model.load_state_dict(model_state_dict)
