@@ -4,6 +4,7 @@
 import os
 import sys
 import json
+import time
 import torch
 import tiktoken
 from functools import partial
@@ -40,6 +41,7 @@ BASE_CONFIG.update(model_configs[CHOOSE_MODEL])
 FILE_PATH = "../data/raw/instruction-data.json"
 NUM_WORKERS = 0                                     # Increase if the OS supports Python parallel processes 
 BATCH_SIZE = 8
+NUM_EPOCHS = 2
 
 model_size = CHOOSE_MODEL.split(" ")[-1].lstrip("(").rstrip(")")
 
@@ -118,4 +120,22 @@ with torch.no_grad():
 )
 print("- Training loss:", train_loss)
 print("- Validation loss:", val_loss)
+print()
+
+console.print(f"Training", style="gold1")
+start_time = time.time()
+torch.manual_seed(123)
+optimizer = torch.optim.AdamW(
+    model.parameters(), lr=0.00005, weight_decay=0.1
+)
+
+train_losses, val_losses, tokens_seen = train_model_simple(
+    model, train_loader, val_loader, optimizer, device,
+    num_epochs=NUM_EPOCHS, eval_freq=5, eval_iter=5,
+    start_context=format_input(val_data[0]), tokenizer=tokenizer
+)
+
+end_time = time.time()
+execution_time_minutes = (end_time - start_time) / 60
+print(f"Training completed in {execution_time_minutes:.2f} minutes.")
 print()
