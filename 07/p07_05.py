@@ -15,7 +15,7 @@ from torch.utils.data import DataLoader
 import_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../05'))
 if import_dir not in sys.path:
     sys.path.insert(0, import_dir)
-from p05_04 import GPTModel, calc_loss_loader, train_model_simple
+from p05_04 import GPTModel, calc_loss_loader, train_model_simple, IMAGE_FILE, plot_losses
 from p05_10 import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text
 from gpt_download import download_and_load_gpt2
 
@@ -125,9 +125,7 @@ print()
 console.print(f"Training", style="gold1")
 start_time = time.time()
 torch.manual_seed(123)
-optimizer = torch.optim.AdamW(
-    model.parameters(), lr=0.00005, weight_decay=0.1
-)
+optimizer = torch.optim.AdamW(model.parameters(), lr=0.00005, weight_decay=0.1)
 
 train_losses, val_losses, tokens_seen = train_model_simple(
     model, train_loader, val_loader, optimizer, device,
@@ -138,4 +136,9 @@ train_losses, val_losses, tokens_seen = train_model_simple(
 end_time = time.time()
 execution_time_minutes = (end_time - start_time) / 60
 print(f"Training completed in {execution_time_minutes:.2f} minutes.")
+
+# Generate and Metrics Output
+console.print(f"\nPlot", style="gold1")
+epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
+plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 print()
