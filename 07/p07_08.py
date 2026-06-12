@@ -38,8 +38,8 @@ def query_model(
 
     return response_data
 
+# Camabiar indicando el FQDN del servidor ollama 
 URL = "http://workstation.fqdn:11434/api/chat"
-
 
 # Main
 if __name__ == "__main__":  
