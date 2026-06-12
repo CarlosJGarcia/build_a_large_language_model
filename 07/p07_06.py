@@ -2,11 +2,13 @@
 # Basel 12/Jun/2026
 
 import os
+import re
 import sys
 import json
 import time
 import torch
 import tiktoken
+from tqdm import tqdm
 from functools import partial
 from rich.console import Console
 from torch.utils.data import DataLoader
@@ -39,6 +41,7 @@ CHOOSE_MODEL = "gpt2-medium (355M)"
 MODEL_DIR = "../models/gpt2"
 BASE_CONFIG.update(model_configs[CHOOSE_MODEL])
 FILE_PATH = "../data/raw/instruction-data.json"
+RESPONSES_FILE_PATH = "../data/raw/instruction-data-with-response.json"
 NUM_WORKERS = 0                                     # Increase if the OS supports Python parallel processes 
 BATCH_SIZE = 8
 NUM_EPOCHS = 2
@@ -143,7 +146,6 @@ console.print(f"\nPlot", style="gold1")
 epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
 plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 
-
 console.print(f"\nTest Questions / Answers", style="gold1")
 for entry in test_data[:3]:              #1
     input_text = format_input(entry)
@@ -167,3 +169,47 @@ for entry in test_data[:3]:              #1
     print("-------------------------------------")
 #1 Iterates over the first three test set samples
 #2 Uses the generate function imported in section 7.5
+
+# Generating test set responses
+console.print(f"\nGenerating test set answers", style="gold1")
+for i, entry in tqdm(enumerate(test_data), total=len(test_data)):
+    input_text = format_input(entry)
+
+    token_ids = generate(
+        model=model,
+        idx=text_to_token_ids(input_text, tokenizer).to(device),
+        max_new_tokens=256,
+        context_size=BASE_CONFIG["context_length"],
+        eos_id=50256
+    )
+    generated_text = token_ids_to_text(token_ids, tokenizer)
+
+    response_text = (
+        generated_text[len(input_text):]
+        .replace("### Response:", "")
+        .strip()
+    )
+    test_data[i]["model_response"] = response_text
+
+# Crea un nuevo fichero .json y guarda ahí el dataset
+with open(RESPONSES_FILE_PATH, "w") as file:
+    json.dump(test_data, file, indent=4)         # Indentado para que se lea mejor
+print("Test entry[0]:", test_data[0])
+
+# Guarda el modelo fine-tuned
+console.print(f"\nGuardo el modelo", style="gold1")
+file_name = f"../models/07-06-{re.sub(r'[ ()]', '', CHOOSE_MODEL)}-sft.pth"
+torch.save(model.state_dict(), file_name)
+print(f"Model saved as {file_name}\n")
+
+
+# Cargo el modelo de nuevo
+print(f"Loading model {file_name}")
+if torch.cuda.is_available():
+        console.print(f"Using GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
+else:
+        console.print(f"CUDA not available. Using CPU.", style="gold1") 
+model_state_dict = torch.load(file_name, map_location=device, weights_only=True)
+model.load_state_dict(model_state_dict)
+model.eval()
+print("Model loaded\n")
