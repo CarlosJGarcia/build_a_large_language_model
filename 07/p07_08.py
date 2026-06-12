@@ -40,8 +40,10 @@ def query_model(
 
 URL = "http://workstation.fqdn:11434/api/chat"
 
+
 # Main
-model = "llama3"
-print("Quering:", URL)
-result = query_model("What is a Radio Amateur?", model, url=URL)
-print(result)
+if __name__ == "__main__":  
+    model = "llama3"
+    print("Quering:", URL)
+    result = query_model("What is a Radio Amateur?", model, url=URL)
+    print(result)
