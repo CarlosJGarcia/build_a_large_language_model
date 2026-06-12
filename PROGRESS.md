@@ -8,7 +8,7 @@
 | 4. Implementing a GPT model from scratch to generate text | Completed | 27/May/2026 | LLM GPT Architecture |
 | 5. Pretraining on unlabeled data | Completed | 04/Jun/2026 | Pretraining |
 | 6. Fine-tunning for classification | Completed | 10/Jun/2026 | Training - classification |
-| 7. Fine-tunning to follow instructions | Not Started | - | - |
+| 7. Fine-tunning to follow instructions | Completed | 12/Jun/2026 | Training - chat |
 | Appendix A. Introduction to PyTorch | In Progress | - | - |
 | Appendix B. References and further reading | Not Started | - | - |
 | Appendix C. Exercise solutions | Not Started | - | - |
