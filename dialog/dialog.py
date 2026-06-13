@@ -9,7 +9,7 @@ import sys
 # import time
 import torch
 
-# import tiktoken
+import tiktoken
 # from tqdm import tqdm
 # from functools import partial
 from rich.console import Console
@@ -23,8 +23,11 @@ if import_dir not in sys.path:
 # from p05_04 import GPTModel, calc_loss_loader, train_model_simple, IMAGE_FILE, plot_losses
 from p05_04 import GPTModel
 
-"""
+
 from p05_10 import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text
+from p07_02 import format_input
+
+"""
 from gpt_download import download_and_load_gpt2
 
 from p07_02 import format_input, InstructionDataset, custom_collate_fn
@@ -84,11 +87,7 @@ else:
 print("Device:", device)
 
 """
-if torch.cuda.is_available():
-        console.print(f"Loading model on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
-else:
-        console.print(f"CUDA not available. Loading model on CPU.", style="gold1") 
-model.to(device)
+
 torch.manual_seed(123)
 
 
@@ -105,11 +104,11 @@ val_data = data[train_portion + test_portion:]
 test_data = data[train_portion:train_portion + test_portion]
 
 
-
+"""
 # Creo un objeto tokenizer tipo GPT2
 console.print(f"Tokenizer - Tiktoken GPT2\n", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
-
+"""
 
 
 customized_collate_fn = partial(custom_collate_fn, device=device, allowed_max_length=1024)
@@ -227,17 +226,55 @@ file_name = f"../models/07-06-{re.sub(r'[ ()]', '', CHOOSE_MODEL)}-sft.pth"
 
 
 
-# Cargo el modelo de nuevo
+# Cargo el modelo 
 print(f"Loading model {file_name}")
 if torch.cuda.is_available():
         console.print(f"Using GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
 else:
         console.print(f"CUDA not available. Using CPU.", style="gold1") 
-
 model_state_dict = torch.load(file_name, map_location=device, weights_only=True)
 model.load_state_dict(model_state_dict)
 
-"""
+# Put the model in evaluation mode
 model.eval()
+
+# Send the model to the GPU
+model.to(device)
 print("Model loaded\n")
-"""
+
+
+
+# Format the input, convert it to token IDs, pass it through the generate function and decode the output back to text
+
+#question = "What is the capital of Switzerland?"
+question = "You are easily irritable writer. Generate a random short story three lines long and ask me to continue it."
+
+formatted_prompt = format_input({"instruction": question, "input": ""})
+print(f"Prompt to model:\n{formatted_prompt}")
+
+#  Convert and move to GPU/CPU
+token_ids = text_to_token_ids(formatted_prompt, tokenizer).to(device)
+
+# Generate the response
+print("\nGenerating response...")
+with torch.no_grad(): # Disable gradient calculation for faster inference
+    generated_ids = generate(
+        model=model,
+        idx=token_ids,
+        max_new_tokens=2048,
+        context_size=BASE_CONFIG["context_length"],
+        eos_id=50256
+    )
+
+# Convert back to text
+generated_text = token_ids_to_text(generated_ids, tokenizer)
+
+# Clean up the output to show just the model's response
+
+response_text = (
+    generated_text[len(formatted_prompt):]
+    .replace("### Response:", "")
+    .strip()
+)
+
+print(f"\n Model response:\n>> {response_text}")
