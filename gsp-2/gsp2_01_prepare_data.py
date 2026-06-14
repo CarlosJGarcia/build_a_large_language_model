@@ -49,7 +49,7 @@ tokenized_dataset = dataset.map(
 # Muestra el tiempo
 end_time = time.time()
 execution_time_minutes = (end_time - start_time) / 60
-console.print(f"\nTokenizing openwebtext completed in {execution_time_minutes:.2f} minutes.", style="gold1", highlight=False)
+console.print(f"Tokenizing openwebtext completed in {execution_time_minutes:.2f} minutes.\n", style="gold1", highlight=False)
 
 # torch.manual_seed(SEED)
 # console.print(f"\nEmbedding matrix created", style="gold1")
@@ -57,5 +57,5 @@ console.print(f"\nTokenizing openwebtext completed in {execution_time_minutes:.2
 
 # Saves the data to disk using HF Datasets and Apache Arrow
 tokenized_dataset.save_to_disk(OPENWEBTEXT_TOKENIZED_PATH) 
-console.print(f"\nTokenized dataset saved ({OPENWEBTEXT_TOKENIZED_PATH})", style="gold1")
+console.print(f"Tokenized dataset saved ({OPENWEBTEXT_TOKENIZED_PATH})", style="gold1", highlight=False)
 print()
