@@ -1,12 +1,13 @@
+import time
 import tiktoken
 from rich.console import Console
 from datasets import load_dataset
 
-DATASET_ID = "Skylion007/openwebtext"
+DATASET_ID = "Skylion007/openwebtext"  # The canonical Openwebtext dataset in Hugging Face
 SPLIT = "train"  
-NUM_PROC = 22                # Number of parallel process = number or CPU threads used. The Z640 Xeon has 14 cores = 28 threads
-                             # Pero, como openwebtext está dividido en solo 12 ficheros (shards), solo habrá 12 procesos corriendo en la CPU, uno en cada thread
+NUM_PROC = 12                          # Número de procesos en paralelo = número de ficheros (shards) en el dataset. Cada uno va a un thread de la CPU
 
+   
 # Define a wrapper function for the map. This function encodes the text and returns the IDs. encode_ordinary is slightly faster than encode
 def process_text(example):
     ids = tokenizer.encode_ordinary(example['text']) 
@@ -14,14 +15,16 @@ def process_text(example):
 
 # Creo un objeto tokenizer tipo GPT2
 console = Console()
-console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
+console.print(f"\nTokenizer created (Tiktoken GPT2)", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
 
-# Load the dataset
-dataset = load_dataset(DATASET_ID, split=SPLIT)
+# Load dataset, Training split
+console.print(f"\nLoad dataset ({DATASET_ID})", style="gold1")
+dataset = load_dataset(DATASET_ID, split=SPLIT, num_proc=NUM_PROC)
 
 # Fire up all the Xeon Cores!
 console.print(f"\nTokenizing", style="gold1")
+start_time = time.time()
 tokenized_dataset = dataset.map(
     process_text,
     remove_columns=['text'], # Drop the raw text to save memory
@@ -29,3 +32,9 @@ tokenized_dataset = dataset.map(
     num_proc=NUM_PROC,
     load_from_cache_file=False  # Forces the CPU to do the work again 
 )
+
+# Muestra el tiempo
+end_time = time.time()
+execution_time_minutes = (end_time - start_time) / 60
+console.print(f"\nTokenizing openwebtext completed in {execution_time_minutes:.2f} minutes.", style="gold1", highlight=False)
+print()
