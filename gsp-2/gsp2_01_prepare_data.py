@@ -1,13 +1,26 @@
+# # GSP-2 Prepare data (gsp2_01_prepare_data.py)
+
+# Loads the OpenWebText dataset from Hugging Face, using HF Datasets library
+# Tokenized the datasets with Tiktoken
+# Creates the embedding matrix with PyTorch
+# Saves the data to disk
+
+# Reinach 14/Jun/2026
+
 import time
+import torch
 import tiktoken
 from rich.console import Console
 from datasets import load_dataset
 
+
 DATASET_ID = "Skylion007/openwebtext"  # The canonical Openwebtext dataset in Hugging Face
 SPLIT = "train"  
 NUM_PROC = 12                          # Número de procesos en paralelo = número de ficheros (shards) en el dataset. Cada uno va a un thread de la CPU
+VOCAB_SIZE = 50257                     # GPT-2 vocabulary size
+OUTPUT_DIM = 768                       # GPT-2 vector size
+SEED = 123                             # Random seed for reproducibility, could be 42
 
-   
 # Define a wrapper function for the map. This function encodes the text and returns the IDs. encode_ordinary is slightly faster than encode
 def process_text(example):
     ids = tokenizer.encode_ordinary(example['text']) 
@@ -37,4 +50,8 @@ tokenized_dataset = dataset.map(
 end_time = time.time()
 execution_time_minutes = (end_time - start_time) / 60
 console.print(f"\nTokenizing openwebtext completed in {execution_time_minutes:.2f} minutes.", style="gold1", highlight=False)
+
+torch.manual_seed(SEED)
+console.print(f"\nEmbedding matrix created", style="gold1")
+embedding_layer = torch.nn.Embedding(VOCAB_SIZE, OUTPUT_DIM)
 print()
