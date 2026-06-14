@@ -14,3 +14,10 @@ Kaiseraugst, May 2026
 | 04-06-cuda.py | 04-06 with CUDA instead of CPU | 
 | 04-exercise-42-cuda.py | 04-06 in medium size (400 M param) instead of small |
 | 05-04.py | Train the (small size) model with 30 books from Project Gutemberg sot learns words, syntax and builds phrases | 
+
+
+| File | Description | 
+|---------|------------------|
+| gsp2_01_prepare_data.py | Load openwebtext, tokenize and save |
+| gsp2_02_gpt_model.py | Contains all the classes of the architecture (MultiHeadAttention, TransformerBlock, GPTModel) it is a library |
+| gsp2_03_train.py | Load the saved data from disk, imports the GPTModel from gsp2_02_gpt_model.py, sets up the PyTorch DataLoader, defines the Optimizer, and runs the actual training loop (Epochs) on the GPU |
