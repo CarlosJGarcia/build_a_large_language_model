@@ -16,7 +16,6 @@ OUTPUT_DIM_MEDIUM = 1024               # Medium GPT-2 embedding vector size
 NUM_HEADS_MEDIUM = 16                  # Medium GPT-2 attention heads
 
 
-
 # Python dictionary. Configuration of the small GPT-2 model
 GPT_CONFIG_124M = {
     "vocab_size": VOCAB_SIZE,          # Vocabulary size
