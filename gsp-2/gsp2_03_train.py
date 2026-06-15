@@ -1,3 +1,12 @@
+# # GSP-2 Create the model and train it (gsp2_03_train.py)
+
+# Loads the OpenWebText dataset from Hugging Face, using HF Datasets library
+# Tokenized the datasets with Tiktoken
+# Saves the data to disk
+
+# Reinach 14/Jun/2026
+
+
 # Pretrain the LLM using 30 books from project gutemberg 
 # 05-04.py
 
@@ -456,16 +465,6 @@ if __name__ == "__main__":
     plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 """
 
-# Pretrain the LLM using 30 books from project gutemberg 
-# 05-04.py
-
-# What the Model does during the training epochs
-# When you stopped the first run at Epoch 1, the model was still in "kindergarten." Over the next 9 epochs, it underwent a massive conceptual shift
-# Epoch 1 (What you see in Graph 1): The model is just learning basic token mechanics. It figures out that the letter "t" is often followed by "h" and "e", and that common words like "the", "and", and "of" appear frequently. It has zero concept of how a full sentence is structured.
-#Epochs 2–5: The model begins mastering local syntax. It learns parts of speech—that nouns follow adjectives, verbs follow subjects, and quotation marks need to close.
-#Epochs 6–10 (What you see in Graph 2): The model adapts to the macro-style of your 30 Project Gutenberg books. It begins tracking long-range context (remembering the subject from 50 tokens back) and heavily mimics the 19th-century vocabulary, formatting, and pacing of the novels.
-
-import os
 import torch
 import tiktoken
 from torch.utils.data import DataLoader, IterableDataset
@@ -632,9 +631,9 @@ def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
     plt.show()
 
 
-# ==========================================
-# 3. EXECUTION FLOW
-# ==========================================
+# =========
+# Execution
+# =========
 
 if __name__ == "__main__":
     # --- Step A: Quick Toy Data Smoke Test ---
