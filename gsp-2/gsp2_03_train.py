@@ -683,7 +683,7 @@ if __name__ == "__main__":
     val_data = split_dataset['test']
 
     torch.manual_seed(123)
-    context_length = GPT_CONFIG_124M["context_length"]
+    context_length = GPT_CONFIG_355M["context_length"]
 
     train_dataset = OpenWebTextIterableDataset(train_data, max_length=context_length)
     val_dataset = OpenWebTextIterableDataset(val_data, max_length=context_length)
