@@ -483,7 +483,7 @@ OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized"
 IMAGE_FILE = "training_validation_losses.png"
 
 # Batch_size = 8 for better use of the RTX 3060 (12GB VRAM) with a 1024 context length
-BATCH_SIZE = 8
+BATCH_SIZE = 4
 
 # 1 Epoch for large corpus training efficiency (OpenWebText is massive)
 NUM_EPOCHS = 1 
@@ -641,7 +641,7 @@ if __name__ == "__main__":
     targets = torch.tensor([[3626, 6100, 345], [1107, 588, 11311]])  
 
     console = Console()
-    console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
+    console.print(f"\nTokenizer created (Tiktoken GPT2)", style="gold1")
     tokenizer = tiktoken.get_encoding("gpt2")
 
     console.print(f"\nInstance TransformerBlock", style="gold1")
@@ -662,18 +662,18 @@ if __name__ == "__main__":
     logits_flat = logits.flatten(0, 1)
     targets_flat = targets.flatten()
     loss = torch.nn.functional.cross_entropy(logits_flat, targets_flat)
-    console.print(f"Initial Baseline Loss: {loss:.4f}", style="bright_blue")
+    print(f"Initial Baseline Loss: {loss:.4f}")
 
 
     # --- Step B: Load Multi-Book Dataset ---
-    console.print(f"\nLoading tokenized dataset from '{OPENWEBTEXT_TOKENIZED_PATH}'", style="gold1")
+    console.print(f"\nLoading tokenized dataset ({OPENWEBTEXT_TOKENIZED_PATH})", style="gold1", highlight=False)
     
     try:
         hf_dataset = load_from_disk(OPENWEBTEXT_TOKENIZED_PATH)
     except Exception as e:
         raise FileNotFoundError(f"Could not load dataset from '{OPENWEBTEXT_TOKENIZED_PATH}'. Did you run gsp2_01_prepare_data.py?")
 
-    print(f"\nTotal Dataset Documents: {len(hf_dataset):,}")
+    print(f"Total Dataset Documents: {len(hf_dataset):,}")
 
 
     # --- Step C: Create Scaled Data Loaders ---
@@ -695,10 +695,9 @@ if __name__ == "__main__":
     # --- Step D: Set Up Processing Engine ---
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if torch.cuda.is_available():
-        console.print(f"\nTraining on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue")
+        console.print(f"\nTraining on GPU: {torch.cuda.get_device_name(0)}", style="bright_blue", highlight=False)
     else:
         console.print(f"\nCUDA not available. Training on CPU.", style="gold1")          
-    
     model.to(device)                                                                       
 
     with torch.no_grad():                                                                  
@@ -715,6 +714,7 @@ if __name__ == "__main__":
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
     
+    start_time = time.time()
     # eval_freq raised to 500 considering OpenWebText's massive scale
     train_losses, val_losses, tokens_seen = train_model_simple(
         model, train_loader, val_loader, optimizer, device,
@@ -722,6 +722,14 @@ if __name__ == "__main__":
         start_context="Every effort moves you", tokenizer=tokenizer
     )
 
+    # Muestra el tiempo
+    end_time = time.time()
+    execution_time_hours = (end_time - start_time) / 3600
+    execution_time_days = execution_time_hours / 24
+    console.print(f"Training completed in {execution_time_hours:.2f} hours ({execution_time_days:.2f} days).\n", style="gold1", highlight=False)
+
     # --- Step F: Generate and Metrics Output ---
     epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
     plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+
+    
