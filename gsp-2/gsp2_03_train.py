@@ -38,7 +38,7 @@ IMAGE_FILE = "training_validation_losses.png"
 MODEL_PATH = "../models/gsp-2/gsp2_355m.pth"
 
 # Batch_size = 8 for better use of the RTX 3060 (12GB VRAM) with a 1024 context length
-BATCH_SIZE = 4
+BATCH_SIZE = 8
 
 # 1 Epoch for large corpus training efficiency (OpenWebText is massive)
 NUM_EPOCHS = 1 
@@ -292,7 +292,7 @@ if __name__ == "__main__":
     print("Initial Untrained Validation loss:", val_loss)
 
 
-    # --- Step E: Run Pretraining Cycle ---
+    # --- Step E: Run Pretraining Cycle. Initialize the AdamW optimizer
     torch.manual_seed(123)
     optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
     
