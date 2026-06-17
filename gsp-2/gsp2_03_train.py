@@ -35,6 +35,7 @@ from gsp2_02_gpt_model import GPTModel, GPT_CONFIG_355M
 # Configuration Constants
 OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized"
 IMAGE_FILE = "training_validation_losses.png"
+MODEL_PATH = "../models/gsp-2/gsp2_355m.pth"
 
 # Batch_size = 8 for better use of the RTX 3060 (12GB VRAM) with a 1024 context length
 BATCH_SIZE = 4
@@ -280,8 +281,13 @@ if __name__ == "__main__":
     execution_time_days = execution_time_hours / 24
     console.print(f"Training completed in {execution_time_hours:.2f} hours ({execution_time_days:.2f} days).\n", style="gold1", highlight=False)
 
-    # --- Step F: Generate and Metrics Output ---
+    # Generate and Metrics Output ---
     epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
     plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+
+    # Guarda el modelo
+    torch.save(model.state_dict(), MODEL_PATH)
+    print(f"\nModel saved as {MODEL_PATH}")
+    print()
 
     
