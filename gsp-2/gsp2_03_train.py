@@ -138,8 +138,30 @@ def generate_and_print_sample(model, tokenizer, device, start_context):
     print(decoded_text.replace("\n", " "))      
     model.train()
 
-def train_model_simple(model, train_loader, val_loader, optimizer, device, 
-                       num_epochs, eval_freq, eval_iter, start_context, tokenizer):
+
+class EarlyStopping:
+    def __init__(self, patience=5, delta=0.001):
+        self.patience = patience  # How many evals to wait
+        self.delta = delta        # Min change to qualify as improvement
+        self.counter = 0
+        self.best_loss = float('inf')
+        self.early_stop = False
+
+    def __call__(self, val_loss):
+        if val_loss < self.best_loss - self.delta:
+            self.best_loss = val_loss
+            self.counter = 0
+        else:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+
+
+def train_model_simple(model, train_loader, val_loader, optimizer, device, num_epochs, eval_freq, eval_iter, start_context, tokenizer):
+    
+    # Initialize Early Stopping (e.g., patience=5 means stop after 5 evals without improvement)
+    stopper = EarlyStopping(patience=5, delta=0.001)
+    
     train_losses, val_losses, track_tokens_seen = [], [], []    
     tokens_seen, global_step = 0, -1
 
@@ -159,6 +181,13 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device,
 
             if global_step % eval_freq == 0:                    
                 train_loss, val_loss = evaluate_model(model, train_loader, val_loader, device, eval_iter)
+
+                # Check for early stopping
+                stopper(val_loss)
+                if stopper.early_stop:
+                    print("Early stopping triggered. Model has plateaued.")
+                    return train_losses, val_losses, track_tokens_seen
+
                 train_losses.append(train_loss)
                 val_losses.append(val_loss)
                 track_tokens_seen.append(tokens_seen)

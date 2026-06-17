@@ -3,7 +3,9 @@
 import torch
 import tiktoken
 import torch.nn as nn
+import torch.nn.functional as F
 from rich.console import Console
+
 
 
 CONTEXT_LENGTH = 1024
@@ -69,25 +71,32 @@ class MultiHeadAttention(nn.Module):
 
         keys = keys.view(b, num_tokens, self.num_heads, self.head_dim)       #4
         values = values.view(b, num_tokens, self.num_heads, self.head_dim)  
-        queries = queries.view(                                             
-            b, num_tokens, self.num_heads, self.head_dim                    
-        )                                                                   
+        queries = queries.view(b, num_tokens, self.num_heads, self.head_dim)                                                                   
 
         keys = keys.transpose(1, 2)          #5
         queries = queries.transpose(1, 2)    #5
         values = values.transpose(1, 2)      #5
 
+        """
         attn_scores = queries @ keys.transpose(2, 3)   #6
         mask_bool = self.mask.bool()[:num_tokens, :num_tokens]    #7
 
         attn_scores.masked_fill_(mask_bool, -torch.inf)     #8
 
-        attn_weights = torch.softmax(
-            attn_scores / keys.shape[-1]**0.5, dim=-1)
+        attn_weights = torch.softmax(attn_scores / keys.shape[-1]**0.5, dim=-1)
         attn_weights = self.dropout(attn_weights)
 
         context_vec = (attn_weights @ values).transpose(1, 2)   #9
-        #10
+        """
+
+        # FlashAttention
+        context_vec = F.scaled_dot_product_attention(
+            queries, keys, values, 
+            attn_mask=None, 
+            dropout_p=self.dropout.p if self.training else 0.0, 
+            is_causal=True
+        ).transpose(1, 2)
+
         context_vec = context_vec.contiguous().view(
             b, num_tokens, self.d_out
         )
