@@ -20,4 +20,5 @@ Kaiseraugst, May 2026
 |---------|------------------|
 | gsp2_01_prepare_data.py | Load openwebtext, tokenize and save |
 | gsp2_02_gpt_model.py | Contains all the classes of the architecture (MultiHeadAttention, TransformerBlock, GPTModel) it is a library |
-| gsp2_03_train.py | Load the saved data from disk, imports the GPTModel from gsp2_02_gpt_model.py, sets up the PyTorch DataLoader, defines the Optimizer, and runs the actual training loop (Epochs) on the GPU |
+| gsp2_03_train.py | Load the saved data from disk, imports the GPTModel from gsp2_02_gpt_model.py, sets up the PyTorch DataLoader, defines the Optimizer, and runs the actual training loop (Epochs) on the GPU and saves the model|
+| gsp2_04_inference.py | Loads the model from disk and makes some test inferences |
