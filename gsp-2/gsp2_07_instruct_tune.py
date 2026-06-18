@@ -7,69 +7,63 @@
 
 # Reinach 18/Jun/2026
 
-import os
-import re
-import sys
-import json
-import time
-import torch
-import tiktoken
-from tqdm import tqdm
-from functools import partial
-from rich.console import Console
-from torch.utils.data import DataLoader
 
-# Point Python to the folder one level up, named '05' so "from p05_04, from p05_10 and from gpt_download" work
+# import os
+# import re
+# import sys
+# import json
+# import time
+import torch
+# import tiktoken
+# from tqdm import tqdm
+# from functools import partial
+from rich.console import Console
+# from torch.utils.data import DataLoader
+
 
 from gsp2_02_gpt_model import GPTModel
-from gsp2_03_train.py import calc_loss_loader, train_model_simple, plot_losses
+from gsp2_03_train import calc_loss_loader, train_model_simple, plot_losses, MODEL_PATH
+from gsp2_06_prepare_model_fine import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text, download_and_load_gpt2
 
-from p05_10 import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text
-from gpt_download import download_and_load_gpt2
-
-from p07_02 import format_input, InstructionDataset, custom_collate_fn
+# from gpt_download import download_and_load_gpt2
+# from p07_02 import format_input, InstructionDataset, custom_collate_fn
 
 BASE_CONFIG = {
     "vocab_size": 50257,     # Vocabulary size
     "context_length": 1024,  # Context length
     "drop_rate": 0.0,        # Dropout rate
-    "qkv_bias": True         # Query-key-value bias
+    "qkv_bias": False,       # Query-key-value bias
+    "emb_dim": 1024,
+    "n_layers": 24,
+    "n_heads": 16
 }
-
-model_configs = {
-    "gpt2-small (124M)": {"emb_dim": 768, "n_layers": 12, "n_heads": 12},
-    "gpt2-medium (355M)": {"emb_dim": 1024, "n_layers": 24, "n_heads": 16},
-    "gpt2-large (774M)": {"emb_dim": 1280, "n_layers": 36, "n_heads": 20},
-    "gpt2-xl (1558M)": {"emb_dim": 1600, "n_layers": 48, "n_heads": 25},
-}
-
-CHOOSE_MODEL = "gpt2-medium (355M)"
-MODEL_DIR = "../models/gsp-2"
-
-BASE_CONFIG.update(model_configs[CHOOSE_MODEL])
-FILE_PATH = "../data/raw/instruction-data.json"
-
-ALPACA_FILTERED_PATH = "../data/processed/alpaca_filtered.json"
 
 NUM_WORKERS = 0                                     # Increase if the OS supports Python parallel processes 
 BATCH_SIZE = 8
 NUM_EPOCHS = 2
 
+
+
+
+FILE_PATH = "../data/raw/instruction-data.json"
+
+ALPACA_FILTERED_PATH = "../data/processed/alpaca_filtered.json"
+
 IMAGE_FILE = "finetuning_validation_losses.png"
 
-model_size = CHOOSE_MODEL.split(" ")[-1].lstrip("(").rstrip(")")
-
-settings, params = download_and_load_gpt2(
-    model_size=model_size, 
-    models_dir=MODEL_DIR
-)
+# - MODEL_SIZE = "355M"
+# - MODEL_DIR = "../models/gsp-2"
+# - settings, params = download_and_load_gpt2(model_size=MODEL_SIZE, models_dir=MODEL_DIR)
 
 console = Console()
 console.print(f"\nLoading model", style="gold1")
 model = GPTModel(BASE_CONFIG)
-load_weights_into_gpt(model, params)
+# - load_weights_into_gpt(model, params)
+model_state_dict = torch.load(MODEL_PATH, map_location="cpu", weights_only=True)
+model.load_state_dict(model_state_dict)
 model.eval()
 
+"""
 if torch.cuda.is_available():
     device = "cuda"
 else:
@@ -212,6 +206,8 @@ console.print(f"\nGuardo el modelo", style="gold1")
 file_name = f"../models/07-06-{re.sub(r'[ ()]', '', CHOOSE_MODEL)}-sft.pth"
 torch.save(model.state_dict(), file_name)
 print(f"Model saved as {file_name}\n")
+"""
+
 
 """
 # Cargo el modelo de nuevo
