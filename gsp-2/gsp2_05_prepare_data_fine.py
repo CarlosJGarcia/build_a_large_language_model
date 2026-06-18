@@ -10,14 +10,17 @@
 import json
 from datasets import load_dataset
 
+ALPACA_FILTERED_PATH = "../data/processed/alpaca_filtered.json"
+
 # Load official Alpaca dataset from Hugging Face
-print("Downloading/Loading dataset from Hugging Face...")
+print()
+print("Downloading/Loading dataset from Hugging Face")
 dataset = load_dataset("tatsu-lab/alpaca", split="train")
 
 print(f"Original dataset size: {len(dataset)} entries.")
 
 # Filter out entries that have extra context in the 'input' field
-print("Filtering out entries with extra inputs...")
+print("Filtering out entries with extra inputs.")
 filtered_dataset = dataset.filter(lambda x: x["input"].strip() == "")
 
 print(f"Filtered dataset size: {len(filtered_dataset)} entries.")
@@ -25,14 +28,12 @@ print(f"Filtered dataset size: {len(filtered_dataset)} entries.")
 # Convert the Hugging Face Dataset format into a standard list of dictionaries
 filtered_data_list = [row for row in filtered_dataset]
 
-"""
-# 4. Save locally as a standard, indented JSON file
-output_filename = "alpaca_data_filtered.json"
-print(f"Saving to {output_filename}...")
+# Save locally as a standard, indented JSON file
+print(f"Saving to {ALPACA_FILTERED_PATH}")
 
-with open(output_filename, "w", encoding="utf-8") as f:
+with open(ALPACA_FILTERED_PATH, "w", encoding="utf-8") as f:
     json.dump(filtered_data_list, f, indent=4)
-"""
-print("Done. Ready to train.")
+print("Done.")
+print()
 
 

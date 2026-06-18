@@ -21,3 +21,7 @@ models/
 
 # Tokenized OpenWebText
 data/processed/openwebtext_tokenized/
+
+# Alpaca filtered
+data/processed/alpaca_filtered.json
+
