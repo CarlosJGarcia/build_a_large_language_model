@@ -1,8 +1,8 @@
 # GSP-2 Fine-tuning (gsp2_04_instruct_tune.py)
 
 # Loads the trained model
-# Fine-tunes the LLM to follow instructions and to be able to perform other conversational tasks
 # SFT: Supervised Fine-Tuning
+# Fine-tunes the LLM to follow instructions and to be able to perform conversational tasks
 # Uses the Alpaca dataset (50.000 entradas) filtered to remove the ones (35%) with two different input fields
 
 # Reinach 18/Jun/2026
@@ -11,19 +11,18 @@
 # import os
 # import re
 # import sys
-# import json
+import json
 # import time
 import torch
-# import tiktoken
+import tiktoken
 # from tqdm import tqdm
 # from functools import partial
 from rich.console import Console
 # from torch.utils.data import DataLoader
 
-
-from gsp2_02_gpt_model import GPTModel
-from gsp2_03_train import calc_loss_loader, train_model_simple, plot_losses, MODEL_PATH
-from gsp2_06_prepare_model_fine import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text, download_and_load_gpt2
+from p02_gpt_model import GPTModel, GPT_CONFIG_355M
+from p03_train import calc_loss_loader, train_model_simple, plot_losses, MODEL_PATH
+# from gsp2_06_prepare_model_fine import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text, download_and_load_gpt2
 
 # from gpt_download import download_and_load_gpt2
 # from p07_02 import format_input, InstructionDataset, custom_collate_fn
@@ -38,32 +37,30 @@ BASE_CONFIG = {
     "n_heads": 16
 }
 
-NUM_WORKERS = 0                                     # Increase if the OS supports Python parallel processes 
+
 BATCH_SIZE = 8
 NUM_EPOCHS = 2
-
-
-
+NUM_WORKERS = 0                                     # Increase if the OS supports Python parallel processes 
 
 FILE_PATH = "../data/raw/instruction-data.json"
-
-ALPACA_FILTERED_PATH = "../data/processed/alpaca_filtered.json"
-
 IMAGE_FILE = "finetuning_validation_losses.png"
+ALPACA_FILTERED_PATH = "../data/processed/alpaca_filtered.json"
 
 # - MODEL_SIZE = "355M"
 # - MODEL_DIR = "../models/gsp-2"
 # - settings, params = download_and_load_gpt2(model_size=MODEL_SIZE, models_dir=MODEL_DIR)
 
 console = Console()
-console.print(f"\nLoading model", style="gold1")
-model = GPTModel(BASE_CONFIG)
+console.print(f"\nLoading model ({MODEL_PATH})", style="gold1", highlight=False)
+# model = GPTModel(BASE_CONFIG)
+model = GPTModel(GPT_CONFIG_355M)
+
 # - load_weights_into_gpt(model, params)
 model_state_dict = torch.load(MODEL_PATH, map_location="cpu", weights_only=True)
 model.load_state_dict(model_state_dict)
 model.eval()
 
-"""
+
 if torch.cuda.is_available():
     device = "cuda"
 else:
@@ -89,12 +86,10 @@ train_data = data[:train_portion]
 val_data = data[train_portion + test_portion:]
 test_data = data[train_portion:train_portion + test_portion]
 
-
-
 # Creo un objeto tokenizer tipo GPT2
 console.print(f"Tokenizer - Tiktoken GPT2\n", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
-
+"""
 
 
 customized_collate_fn = partial(custom_collate_fn, device=device, allowed_max_length=1024)
