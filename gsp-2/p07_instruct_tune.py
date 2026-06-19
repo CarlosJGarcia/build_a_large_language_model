@@ -12,7 +12,7 @@
 # import re
 # import sys
 import json
-# import time
+import time
 import torch
 import tiktoken
 # from tqdm import tqdm
@@ -24,7 +24,7 @@ from p02_gpt_model import GPTModel, GPT_CONFIG_355M
 from p03_train import calc_loss_loader, train_model_simple, plot_losses, MODEL_PATH
 
 # from gsp2_06_prepare_model_fine import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text, download_and_load_gpt2
-from p06_prepare_model_fine import custom_collate_fn, InstructionDataset
+from p06_prepare_model_fine import custom_collate_fn, InstructionDataset, format_input
 
 # from gpt_download import download_and_load_gpt2
 # from p07_02 import format_input, InstructionDataset, custom_collate_fn
@@ -119,7 +119,7 @@ val_loader = DataLoader(
 )
 
 
-"""
+
 # Calculate the initial loss (Epoch 0). Besc practice in Deep Learning. Diagnostic before launching the training
 print("Epoch 0 checks before fine-tunning:")
 with torch.no_grad():
@@ -133,10 +133,12 @@ print("- Training loss:", train_loss)
 print("- Validation loss:", val_loss)
 print()
 
+
 console.print(f"Training", style="gold1")
 start_time = time.time()
 torch.manual_seed(123)
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.00005, weight_decay=0.1)
+
 
 train_losses, val_losses, tokens_seen = train_model_simple(
     model, train_loader, val_loader, optimizer, device,
@@ -147,6 +149,8 @@ train_losses, val_losses, tokens_seen = train_model_simple(
 end_time = time.time()
 execution_time_minutes = (end_time - start_time) / 60
 print(f"Training completed in {execution_time_minutes:.2f} minutes.")
+"""
+
 
 # Generate and Metrics Output
 console.print(f"\nPlot", style="gold1")
