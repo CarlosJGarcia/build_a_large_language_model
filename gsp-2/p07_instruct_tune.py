@@ -16,7 +16,7 @@ import json
 import torch
 import tiktoken
 # from tqdm import tqdm
-# from functools import partial
+from functools import partial
 from rich.console import Console
 # from torch.utils.data import DataLoader
 
@@ -89,10 +89,15 @@ test_data = data[train_portion:train_portion + test_portion]
 # Creo un objeto tokenizer tipo GPT2
 console.print(f"Tokenizer - Tiktoken GPT2\n", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
-"""
+
 
 
 customized_collate_fn = partial(custom_collate_fn, device=device, allowed_max_length=1024)
+
+
+"""
+
+
 train_dataset = InstructionDataset(train_data, tokenizer)
 train_loader = DataLoader(
     train_dataset,

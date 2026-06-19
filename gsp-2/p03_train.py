@@ -30,7 +30,7 @@ from datasets import load_from_disk
 # Import the architecture and configurations from gsp2_02_gpt_model.py
 # Small model with 124M parameters. Does not work on RTX 3060, works in 5060 16 GB, reducing the batch size from 8 to 4
 # Training a medium model 355M parameters requires more VRAM, 16 GB is not enough.
-from gsp2_02_gpt_model import GPTModel, GPT_CONFIG_355M
+from p02_gpt_model import GPTModel, GPT_CONFIG_355M
 
 # Configuration Constants
 OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized"
