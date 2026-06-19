@@ -18,11 +18,13 @@ import tiktoken
 # from tqdm import tqdm
 from functools import partial
 from rich.console import Console
-# from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader
 
 from p02_gpt_model import GPTModel, GPT_CONFIG_355M
 from p03_train import calc_loss_loader, train_model_simple, plot_losses, MODEL_PATH
+
 # from gsp2_06_prepare_model_fine import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text, download_and_load_gpt2
+from p06_prepare_model_fine import custom_collate_fn, InstructionDataset
 
 # from gpt_download import download_and_load_gpt2
 # from p07_02 import format_input, InstructionDataset, custom_collate_fn
@@ -93,12 +95,9 @@ tokenizer = tiktoken.get_encoding("gpt2")
 
 
 customized_collate_fn = partial(custom_collate_fn, device=device, allowed_max_length=1024)
-
-
-"""
-
-
 train_dataset = InstructionDataset(train_data, tokenizer)
+
+
 train_loader = DataLoader(
     train_dataset,
     batch_size=BATCH_SIZE,
@@ -107,6 +106,7 @@ train_loader = DataLoader(
     drop_last=True,
     num_workers=NUM_WORKERS
 )
+
 
 val_dataset = InstructionDataset(val_data, tokenizer)
 val_loader = DataLoader(
@@ -118,6 +118,8 @@ val_loader = DataLoader(
     num_workers=NUM_WORKERS
 )
 
+
+"""
 # Calculate the initial loss (Epoch 0). Besc practice in Deep Learning. Diagnostic before launching the training
 print("Epoch 0 checks before fine-tunning:")
 with torch.no_grad():
