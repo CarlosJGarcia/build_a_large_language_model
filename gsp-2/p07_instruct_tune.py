@@ -15,7 +15,7 @@ import json
 import time
 import torch
 import tiktoken
-# from tqdm import tqdm
+from tqdm import tqdm
 from functools import partial
 from rich.console import Console
 from torch.utils.data import DataLoader
@@ -24,7 +24,7 @@ from p02_gpt_model import GPTModel, GPT_CONFIG_355M
 from p03_train import calc_loss_loader, train_model_simple, plot_losses, MODEL_PATH
 
 # from gsp2_06_prepare_model_fine import load_weights_into_gpt, generate, text_to_token_ids, token_ids_to_text, download_and_load_gpt2
-from p06_prepare_model_fine import custom_collate_fn, InstructionDataset, format_input
+from p06_prepare_model_fine import custom_collate_fn, InstructionDataset, format_input, generate, text_to_token_ids, token_ids_to_text   
 
 # from gpt_download import download_and_load_gpt2
 # from p07_02 import format_input, InstructionDataset, custom_collate_fn
@@ -46,7 +46,8 @@ NUM_WORKERS = 0                                     # Increase if the OS support
 
 FILE_PATH = "../data/raw/instruction-data.json"
 IMAGE_FILE = "finetuning_validation_losses.png"
-ALPACA_FILTERED_PATH = "../data/processed/alpaca_filtered.json"
+ALPACA_FILTERED_PATH = "../data/processed/gsp-2_test_result.json"
+MODEL_PATH_SFT = "../models/gsp-2/gsp2_355m_sft.pth"                # Nombre para el modelo una vez hecho el proceso de SFT Supervised Fine Tuning (HF naming convention)
 
 # - MODEL_SIZE = "355M"
 # - MODEL_DIR = "../models/gsp-2"
@@ -149,13 +150,15 @@ train_losses, val_losses, tokens_seen = train_model_simple(
 end_time = time.time()
 execution_time_minutes = (end_time - start_time) / 60
 print(f"Training completed in {execution_time_minutes:.2f} minutes.")
-"""
+
 
 
 # Generate and Metrics Output
 console.print(f"\nPlot", style="gold1")
 epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
 plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+
+
 
 console.print(f"\nTest Questions / Answers", style="gold1")
 for entry in test_data[:3]:              #1
@@ -181,6 +184,8 @@ for entry in test_data[:3]:              #1
 #1 Iterates over the first three test set samples
 #2 Uses the generate function imported in section 7.5
 
+
+
 # Generating test set responses
 console.print(f"\nGenerating test set answers", style="gold1")
 for i, entry in tqdm(enumerate(test_data), total=len(test_data)):
@@ -202,17 +207,19 @@ for i, entry in tqdm(enumerate(test_data), total=len(test_data)):
     )
     test_data[i]["model_response"] = response_text
 
+
 # Crea un nuevo fichero .json y guarda ahí el dataset
 with open(ALPACA_FILTERED_PATH, "w") as file:
     json.dump(test_data, file, indent=4)         # Indentado para que se lea mejor
 print("Test entry[0]:", test_data[0])
+print(f"Writing file ({ALPACA_FILTERED_PATH})")
+
 
 # Guarda el modelo fine-tuned
 console.print(f"\nGuardo el modelo", style="gold1")
-file_name = f"../models/07-06-{re.sub(r'[ ()]', '', CHOOSE_MODEL)}-sft.pth"
-torch.save(model.state_dict(), file_name)
-print(f"Model saved as {file_name}\n")
-"""
+torch.save(model.state_dict(), MODEL_PATH_SFT)
+print(f"Model saved as {MODEL_PATH_SFT}\n")
+
 
 
 """
