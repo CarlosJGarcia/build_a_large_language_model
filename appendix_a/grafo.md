@@ -1,4 +1,4 @@
-** Los Modelos como grafos **
+**Los Modelos como grafos**
 
 Grafo:
 - Es un mapa que permite organizar y visualizar una serie de operaciones matemáticas.
