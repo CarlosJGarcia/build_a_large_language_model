@@ -1,4 +1,4 @@
-# GSP-2 Fine-tuning (gsp2_04_instruct_tune.py)
+# GSP-2 Fine-tuning (p05_prepare_data.py)
 
 # Loads the trained model
 # Fine-tunes the LLM to follow instructions and to be able to perform other conversational tasks

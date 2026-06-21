@@ -1,4 +1,4 @@
-# GSP-2 (gsp2_06_prepare_model_fine.py)
+# GSP-2 (p06_prepare_model_fine.py)
 
 import torch
 from p03_train import MODEL_PATH

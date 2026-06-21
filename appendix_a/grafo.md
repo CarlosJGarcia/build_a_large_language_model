@@ -17,8 +17,16 @@ Estos calculos son los necesarios para determinar los gradientes y la retropropa
 ![Alt text](grafo.png)
 
 Autograd:
-- módulo de difernciación automática de PyTorch
+- módulo de diferenciación (cálculo numérico de diferenciales) de PyTorch
 - Funciones para calcular gradientes en grafos
 
+Autograd es la librería de diferenciación (cálculo numérico de diferenciales) de PyTorch, Permite calcular gradientes en grafos computacionales dinámicos de forma automática. El término correcto es diferenciación y no derivada ya que es un cálculo multivariable, usando la regla de la cadena
 
-Ahora veamos el motor de diferenciación automática de PyTorch, también conocido como autograd. El sistema autograd de PyTorch proporciona funciones para calcular gradientes en grafos computacionales dinámicos de forma automática.
+Derivada: función que mide la tasa de cambio instantánea de una variable respecto a otra. Geométricamente es la pendiente de la recta tangente a una curva en un punto dado. Notación: $f'(x)$ o también $\frac{dy}{dx}$
+
+Derivada / Diferencial: 
+
+Si f(x) = y
+Derivada de la función f'(x) = dy/dx
+Diferencial de y: dy
+Diferencial de x: dx
