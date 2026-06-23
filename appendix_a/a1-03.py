@@ -1,4 +1,5 @@
 import torch
+from rich.console import Console
 
 # Red neuronal de 3 capas y número de entradas y salidas variable
 class NeuralNetwork(torch.nn.Module):
@@ -24,6 +25,11 @@ class NeuralNetwork(torch.nn.Module):
         return logits                              # The outputs of the last layer are called logits
     
 
+
+# =========
+# Execution
+# =========
+console = Console()
 
 # Instantiate a new neural network
 model = NeuralNetwork(50, 3)
@@ -58,3 +64,16 @@ for n in indices:
     total += (weights + biases)
     layer += 1
 print(f"\nTotal numer of parameters (grand total): {total}\n")
+
+# Inicialización
+console.print(f"Inicialización", style="gold1")
+torch.manual_seed(123)
+model = NeuralNetwork(50, 3)
+print(model.layers[0].weight)
+
+# Forward pass. 
+X = torch.rand((1, 50)) # Genero números aleatorios para la entrada
+out = model(X)          # Forward pass = pasar los datos al modelo. PyTorch los multiplica por los pesos, suma los bias, aplica ReLU
+console.print(f"\nForward pass result:", style="gold1")
+print(out)              # Muestra el resultado
+print()
