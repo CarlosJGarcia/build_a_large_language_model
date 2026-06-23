@@ -29,3 +29,8 @@ print()
 print("grad_L_w1:", grad_L_w1)
 print("grad_L_b:", grad_L_b)
 print()
+
+loss.backward()
+print("w1.grad:", w1.grad)
+print("b.grad:", b.grad)
+print()
