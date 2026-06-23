@@ -45,3 +45,16 @@ print(layer0parameters)
 print()
 
 # Ahora muestro el número de parámetros de cada capa
+layer = 0
+total = 0
+indices = [0, 2, 4] # Lista de los índices de las capas con parámetros. En PyTorch las funciones ReLU tienen su índice, como si fueran una capa
+for n in indices:
+    weights = model.layers[n].weight.numel()
+    biases = model.layers[n].bias.numel()
+    print(f"Layer {layer} (index {n}):")
+    print(f"  - Weights: {weights}")
+    print(f"  - Biases: {biases}")
+    print(f"  - Total (sum): {weights + biases}")
+    total += (weights + biases)
+    layer += 1
+print(f"\nTotal numer of parameters (grand total): {total}\n")
