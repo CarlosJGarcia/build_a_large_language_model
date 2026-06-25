@@ -45,7 +45,7 @@ NUM_EPOCHS = 2
 NUM_WORKERS = 0                                     # Increase if the OS supports Python parallel processes 
 
 FILE_PATH = "../data/raw/instruction-data.json"
-IMAGE_FILE = "finetuning_validation_losses.png"
+IMAGE_FILE = "finetuning_validation_losses_pth.png"
 ALPACA_FILTERED_PATH = "../data/processed/gsp-2_test_result.json"
 MODEL_PATH_SFT = "../models/gsp-2/gsp2_355m_sft.pth"                # Nombre para el modelo una vez hecho el proceso de SFT Supervised Fine Tuning (HF naming convention)
 
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     # Generate and Metrics Output
     console.print(f"\nPlot", style="gold1")
     epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
-    plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+    plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses, IMAGE_FILE)
 
 
 

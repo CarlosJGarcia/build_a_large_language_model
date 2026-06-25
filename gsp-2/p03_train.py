@@ -34,14 +34,15 @@ from p02_gpt_model import GPTModel, GPT_CONFIG_355M
 
 # Configuration Constants
 OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized"
-IMAGE_FILE = "training_validation_losses.png"
-MODEL_PATH = "../models/gsp-2/gsp2_355m.pth"
+IMAGE_FILE = "training_validation_losses_base_base.png"
+MODEL_PATH = "../models/gsp-2/gsp2_355m_base.pth"
 
 # Batch_size = 8 for better use of the RTX 3060 (12GB VRAM) with a 1024 context length
 BATCH_SIZE = 8
 
-# 1 Epoch for large corpus training efficiency (OpenWebText is massive)
-NUM_EPOCHS = 1 
+# 1 Epoch for large corpus training efficiency (OpenWebText is massive) but it is a very light pretraining run
+# 5 Epocs to follow the example of the Gutenberg experiment which used 5-10 epochs.
+NUM_EPOCHS = 5 
 
 
 # ==========================================
@@ -239,7 +240,7 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
         generate_and_print_sample(model, tokenizer, device, start_context)
     return train_losses, val_losses, track_tokens_seen
 
-def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
+def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses, filename):
     fig, ax1 = plt.subplots(figsize=(5, 3))
     ax1.plot(epochs_seen, train_losses, label="Training loss")
     ax1.plot(epochs_seen, val_losses, linestyle="-.", label="Validation loss")
@@ -251,8 +252,8 @@ def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
     ax2.plot(tokens_seen, train_losses, alpha=0)     
     ax2.set_xlabel("Tokens seen")
     fig.tight_layout()
-    plt.savefig(IMAGE_FILE, dpi=300) 
-    print(f"\nPlot saved successfully as {IMAGE_FILE}")
+    plt.savefig(filename, dpi=300) 
+    print(f"\nPlot saved successfully as {filename}")
     plt.show()
 
 
@@ -353,7 +354,7 @@ if __name__ == "__main__":
 
     # Generate and Metrics Output ---
     epochs_tensor = torch.linspace(0, NUM_EPOCHS, len(train_losses))
-    plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+    plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses, IMAGE_FILE)
 
     # Guarda el modelo
     torch.save(model.state_dict(), MODEL_PATH)
