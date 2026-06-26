@@ -25,3 +25,6 @@ data/processed/openwebtext_tokenized/
 # Alpaca filtered
 data/processed/alpaca_filtered.json
 
+# Ignore Weights & Biases run logs and caches
+wandb/
+
