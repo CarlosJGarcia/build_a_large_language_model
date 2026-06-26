@@ -17,7 +17,6 @@
 #Epochs 6–10 (What you see in Graph 2): The model adapts to the macro-style of your 30 Project Gutenberg books. It begins tracking long-range context (remembering the subject from 50 tokens back) and heavily mimics the 19th-century vocabulary, formatting, and pacing of the novels.
 
 
-
 import time
 import torch
 import tiktoken
@@ -34,16 +33,13 @@ from p02_gpt_model import GPTModel, GPT_CONFIG_355M
 
 # Configuration Constants
 OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized"
-IMAGE_FILE = "training_validation_losses_base_base.png"
+IMAGE_FILE = "training_validation_losses_base.png"
 MODEL_PATH = "../models/gsp-2/gsp2_355m_base.pth"
 
-# Batch_size = 8 for better use of the RTX 3060 (12GB VRAM) with a 1024 context length
-BATCH_SIZE = 8
-
-# 1 Epoch for large corpus training efficiency (OpenWebText is massive) but it is a very light pretraining run
-# 5 Epocs to follow the example of the Gutenberg experiment which used 5-10 epochs.
-NUM_EPOCHS = 5 
-
+# Training hyperparameters
+NUM_EPOCHS = 2                   # 1 Epoch for large corpus training efficiency (OpenWebText is massive) 
+BATCH_SIZE = 8                   # Batch_size = 8 for better use of the RTX 3060 (12GB VRAM) with a 1024 context length
+EARLY_STOPPING_PATIENCE = 100
 
 # ==========================================
 # 1. DATA PROCESSING & UTILITIES
@@ -201,8 +197,8 @@ class EarlyStopping:
 
 def train_model_simple(model, train_loader, val_loader, optimizer, device, num_epochs, eval_freq, eval_iter, start_context, tokenizer):
     
-    # Initialize Early Stopping (e.g., patience=5 means stop after 5 evals without improvement)
-    stopper = EarlyStopping(patience=5, delta=0.001)
+    # Initialize Early Stopping 
+    stopper = EarlyStopping(patience=EARLY_STOPPING_PATIENCE, delta=0.001)
     
     train_losses, val_losses, track_tokens_seen = [], [], []    
     tokens_seen, global_step = 0, -1

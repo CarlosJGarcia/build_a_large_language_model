@@ -8,8 +8,8 @@ conda install -c conda-forge rich \
 pip install datasets \
 conda install -c conda-forge lxml -y \
 conda install -c conda-forge nltk -y \
-pip install "tensorflow[and-cuda]"
-
+pip install "tensorflow[and-cuda]" \
+pip install wandb
 
 **Importante:** \
 No hacer `$ conda update --all -c conda-forge -y` porque instala una versión de PyTorch sin CUDA \

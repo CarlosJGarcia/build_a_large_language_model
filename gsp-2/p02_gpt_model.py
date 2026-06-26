@@ -7,9 +7,8 @@ import torch.nn.functional as F
 from rich.console import Console
 
 
-
-CONTEXT_LENGTH = 1024
 VOCAB_SIZE = 50257                     # GPT-2 vocabulary size
+CONTEXT_LENGTH = 1024
 
 OUTPUT_DIM_SMALL = 768                 # Small GPT-2 embedding vector size 
 NUM_HEADS_SMALL = 12                   # Small GPT-2 attention heads
