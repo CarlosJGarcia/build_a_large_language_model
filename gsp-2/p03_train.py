@@ -19,6 +19,7 @@
 
 import time
 import torch
+import wandb
 import tiktoken
 from torch.utils.data import DataLoader, IterableDataset
 from rich.console import Console
@@ -39,6 +40,7 @@ MODEL_PATH = "../models/gsp-2/gsp2_355m_base.pth"
 # Training hyperparameters
 NUM_EPOCHS = 2                   # 1 Epoch for large corpus training efficiency (OpenWebText is massive) 
 BATCH_SIZE = 8                   # Batch_size = 8 for better use of the RTX 3060 (12GB VRAM) with a 1024 context length
+LEARNING_RATE = 0.0004
 EARLY_STOPPING_PATIENCE = 100
 
 # ==========================================
@@ -232,6 +234,15 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
                 print(f"Epoch {epoch+1} (Step {global_step:06d}): "
                       f"Train loss {train_loss:.3f}, "
                       f"Val loss {val_loss:.3f}")
+                
+                # Weights & Biases
+                wandb.log({
+                    "train_loss": train_loss,
+                    "val_loss": val_loss,
+                    "global_step": global_step,
+                    "tokens_seen": tokens_seen,
+                    "epoch": epoch + 1
+                })
 
         generate_and_print_sample(model, tokenizer, device, start_context)
     return train_losses, val_losses, track_tokens_seen
@@ -263,8 +274,20 @@ if __name__ == "__main__":
     targets = torch.tensor([[3626, 6100, 345], [1107, 588, 11311]])  
 
     console = Console()
-    console.print(f"\nTokenizer created (Tiktoken GPT2)", style="gold1")
+
+    # Weights & Biases
+    run = wandb.init(entity="cgarciams-carlos", project="GSP-2",
+    config={
+        "learning_rate": LEARNING_RATE,
+        "architecture": "GPT-2",
+        "dataset": "OpenWebText",
+        "epochs": NUM_EPOCHS,
+    })
+    console.print(f"\nWeights & Biases initialized", style="gold1")
+
+    
     tokenizer = tiktoken.get_encoding("gpt2")
+    console.print(f"\nTokenizer created (Tiktoken GPT2)", style="gold1")
 
     console.print(f"\nInstance TransformerBlock", style="gold1")
     torch.manual_seed(123)
@@ -332,7 +355,7 @@ if __name__ == "__main__":
 
     # --- Step E: Run Pretraining Cycle. Initialize the AdamW optimizer
     torch.manual_seed(123)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=0.0004, weight_decay=0.1)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=0.1)
     
     start_time = time.time()
     # eval_freq raised to 500 considering OpenWebText's massive scale
@@ -356,5 +379,8 @@ if __name__ == "__main__":
     torch.save(model.state_dict(), MODEL_PATH)
     print(f"\nModel saved as {MODEL_PATH}")
     print()
+
+    # Weights & Biases
+    run.finish()
 
     
