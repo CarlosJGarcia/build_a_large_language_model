@@ -1,4 +1,4 @@
-# # GSP-2 Prepare data (gsp2_01_prepare_data.py)
+# # GSP-2 Prepare data (p01_prepare_data.py)
 
 # Loads the OpenWebText dataset from Hugging Face, using HF Datasets library
 # Tokenized the datasets with Tiktoken
