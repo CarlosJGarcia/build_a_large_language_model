@@ -1,0 +1,16 @@
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+torch==2.11.0+cu128
+torchvision
+torchaudio
+matplotlib
+pandas
+tqdm
+jupyterlab
+tiktoken
+rich
+datasets
+lxml
+nltk
+tensorflow[and-cuda]
+wandb
