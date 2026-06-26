@@ -1,8 +1,8 @@
-# GSP-2 Inference test (gsp2_04_inference.py)
+# GSP-2 Inference test (p04_inference.py)
 
 # Loads the trained model
 # Runs a test inference to check that the model works
-# Outcome: a properly trained base model, a neural network that has been taught to speank english from scratch
+# A properly trained base model is a neural network that has been taught to speank english from scratch
 
 # Lugano 17/Jun/2026
 
@@ -10,8 +10,8 @@
 import torch
 import tiktoken
 from rich.console import Console
-from gsp2_02_gpt_model import GPTModel, GPT_CONFIG_355M
-from gsp2_03_train import generate_and_print_sample, generate_and_print, MODEL_PATH
+from p02_gpt_model import GPTModel, GPT_CONFIG_355M
+from p03_train import generate_and_print_sample, generate_and_print, MODEL_PATH
 
 
 console = Console()
