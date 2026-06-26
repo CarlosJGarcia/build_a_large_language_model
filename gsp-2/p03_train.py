@@ -21,11 +21,12 @@ import time
 import torch
 import wandb
 import tiktoken
-from torch.utils.data import DataLoader, IterableDataset
-from rich.console import Console
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
+from rich.console import Console
 from datasets import load_from_disk
+from matplotlib.ticker import MaxNLocator
+from config import OPENWEBTEXT_TOKENIZED_PATH
+from torch.utils.data import DataLoader, IterableDataset
 
 # Import the architecture and configurations from gsp2_02_gpt_model.py
 # Small model with 124M parameters. Does not work on RTX 3060, works in 5060 16 GB, reducing the batch size from 8 to 4
@@ -33,7 +34,7 @@ from datasets import load_from_disk
 from p02_gpt_model import GPTModel, GPT_CONFIG_355M
 
 # Configuration Constants
-OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized"
+# OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized"
 IMAGE_FILE = "training_validation_losses_base.png"
 MODEL_PATH = "../models/gsp-2/gsp2_355m_base.pth"
 

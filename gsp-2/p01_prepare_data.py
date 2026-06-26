@@ -11,6 +11,7 @@ import time
 import tiktoken
 from rich.console import Console
 from datasets import load_dataset
+from config import OPENWEBTEXT_TOKENIZED_PATH
 
 
 DATASET_ID = "Skylion007/openwebtext"  # The canonical Openwebtext dataset in Hugging Face
@@ -19,7 +20,7 @@ NUM_PROC = 12                          # Número de procesos en paralelo = núme
 # VOCAB_SIZE = 50257                     # GPT-2 vocabulary size
 # OUTPUT_DIM = 768                       # GPT-2 vector size
 # SEED = 123                             # Random seed for reproducibility, could be 42
-OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized" # Name of the HF Datasets Apache Arrow folder to save the tokenized dataset
+# OPENWEBTEXT_TOKENIZED_PATH = "../data/processed/openwebtext_tokenized" # Name of the HF Datasets Apache Arrow folder to save the tokenized dataset
 
 # Define a wrapper function for the map. This function encodes the text and returns the IDs. encode_ordinary is slightly faster than encode
 def process_text(example):
