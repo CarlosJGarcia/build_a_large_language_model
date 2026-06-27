@@ -39,7 +39,7 @@ IMAGE_FILE = "training_validation_losses_base.png"
 MODEL_PATH = "../models/gsp-2/gsp2_355m_base.pth"
 
 # Training hyperparameters
-NUM_EPOCHS = 2                   # 1 Epoch for large corpus training efficiency (OpenWebText is massive) 
+NUM_EPOCHS = 1                   # 1 Epoch for large corpus training efficiency and because OpenWebText has more tokens than needed
 BATCH_SIZE = 8                   # Batch_size = 8 for better use of the RTX 3060 (12GB VRAM) with a 1024 context length
 LEARNING_RATE = 0.0004
 EARLY_STOPPING_PATIENCE = 100
