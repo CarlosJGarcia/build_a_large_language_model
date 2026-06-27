@@ -217,7 +217,7 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
                 
             loss.backward()                                     
             # Gradient norm clipping: limits the gradient to a maximum to protect the model if there is a bad document in the dataset
-            # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()                                    
             tokens_seen += input_batch.numel()
             global_step += 1
@@ -364,7 +364,7 @@ if __name__ == "__main__":
     # eval_freq raised to 500 considering OpenWebText's massive scale
     train_losses, val_losses, tokens_seen = train_model_simple(
         model, train_loader, val_loader, optimizer, device,
-        num_epochs=NUM_EPOCHS, eval_freq=500, eval_iter=5,
+        num_epochs=NUM_EPOCHS, eval_freq=500, eval_iter=200,
         start_context="Every effort moves you", tokenizer=tokenizer
     )
 
