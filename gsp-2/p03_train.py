@@ -216,6 +216,8 @@ def train_model_simple(model, train_loader, val_loader, optimizer, device, num_e
                 loss = calc_loss_batch(input_batch, target_batch, model, device)
                 
             loss.backward()                                     
+            # Gradient norm clipping: limits the gradient to a maximum to protect the model if there is a bad document in the dataset
+            # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()                                    
             tokens_seen += input_batch.numel()
             global_step += 1
