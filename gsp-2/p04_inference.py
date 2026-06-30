@@ -2,7 +2,7 @@
 
 # Loads the trained model
 # Runs a test inference to check that the model works
-# A properly trained base model is a neural network that has been taught to speank english from scratch
+# A properly trained base model is a neural network that has been taught to speak english from scratch
 
 # Lugano 17/Jun/2026
 
@@ -28,11 +28,12 @@ if torch.cuda.is_available():
 else:
     console.print(f"\nCUDA not available. Loading model on CPU.", style="gold1")          
 
-# Carga el modelo
+# Loads the model
 print(f"Loading model {MODEL_PATH}")
 model.to(device)
 model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
 model.eval()
+torch.manual_seed(123) 
 console.print(f"Model loaded\n", style="gold1")
 
 # Solo pruebas en inglés porque OpenWebText es 99% texto inglés
