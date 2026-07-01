@@ -38,11 +38,49 @@ console.print(f"Model {MODEL_PATH} loaded", style="gold1", highlight=False)
 # Creates the output directory if it doesn't exist
 os.makedirs(LLAMA_PATH, exist_ok=True)
 
-# 1. Save weights to Safetensors
-# safetensors.torch.save_file requires a dictionary of tensors and a file path
-tensors = model.state_dict()
+# 1. Translate Weights to Hugging Face GPT-2 Format
+original_sd = model.state_dict()
+hf_sd = {}
+
+# Map standard embeddings and final layer norm
+hf_sd["transformer.wte.weight"] = original_sd["tok_emb.weight"]
+hf_sd["transformer.wpe.weight"] = original_sd["pos_emb.weight"]
+hf_sd["transformer.ln_f.weight"] = original_sd["final_norm.scale"]
+hf_sd["transformer.ln_f.bias"] = original_sd["final_norm.shift"]
+hf_sd["lm_head.weight"] = original_sd["out_head.weight"]
+
+# Map Transformer Blocks
+for i in range(GPT_CONFIG_355M["n_layers"]):
+    # Layer Norms
+    hf_sd[f"transformer.h.{i}.ln_1.weight"] = original_sd[f"trf_blocks.{i}.norm1.scale"]
+    hf_sd[f"transformer.h.{i}.ln_1.bias"] = original_sd[f"trf_blocks.{i}.norm1.shift"]
+    hf_sd[f"transformer.h.{i}.ln_2.weight"] = original_sd[f"trf_blocks.{i}.norm2.scale"]
+    hf_sd[f"transformer.h.{i}.ln_2.bias"] = original_sd[f"trf_blocks.{i}.norm2.shift"]
+    
+    # Attention: Concatenate Q, K, V and Transpose (HF expects [in_features, out_features])
+    W_q = original_sd[f"trf_blocks.{i}.att.W_query.weight"]
+    W_k = original_sd[f"trf_blocks.{i}.att.W_key.weight"]
+    W_v = original_sd[f"trf_blocks.{i}.att.W_value.weight"]
+    c_attn_weight = torch.cat([W_q, W_k, W_v], dim=0)
+    
+    # ADDED .contiguous() HERE
+    hf_sd[f"transformer.h.{i}.attn.c_attn.weight"] = c_attn_weight.T.contiguous() 
+    
+    # Inject zeros for QKV bias 
+    hf_sd[f"transformer.h.{i}.attn.c_attn.bias"] = torch.zeros(3 * GPT_CONFIG_355M["emb_dim"], device=device)
+
+    # Attention Output (Transpose) - ADDED .contiguous() HERE
+    hf_sd[f"transformer.h.{i}.attn.c_proj.weight"] = original_sd[f"trf_blocks.{i}.att.out_proj.weight"].T.contiguous()
+    hf_sd[f"transformer.h.{i}.attn.c_proj.bias"] = original_sd[f"trf_blocks.{i}.att.out_proj.bias"]
+    
+    # FeedForward (MLP) (Transpose weights) - ADDED .contiguous() HERE
+    hf_sd[f"transformer.h.{i}.mlp.c_fc.weight"] = original_sd[f"trf_blocks.{i}.ff.layers.0.weight"].T.contiguous()
+    hf_sd[f"transformer.h.{i}.mlp.c_fc.bias"] = original_sd[f"trf_blocks.{i}.ff.layers.0.bias"]
+    hf_sd[f"transformer.h.{i}.mlp.c_proj.weight"] = original_sd[f"trf_blocks.{i}.ff.layers.2.weight"].T.contiguous()
+    hf_sd[f"transformer.h.{i}.mlp.c_proj.bias"] = original_sd[f"trf_blocks.{i}.ff.layers.2.bias"]
+
 safetensors_file = os.path.join(LLAMA_PATH, "model.safetensors")
-save_file(tensors, safetensors_file)
+save_file(hf_sd, safetensors_file)
 console.print(f"Weights saved to: {safetensors_file}", style="bright_green")
 
 # 2. Create a standard Hugging Face config.json
@@ -52,6 +90,7 @@ hf_config = {
     "model_type": "gpt2",
     "vocab_size": VOCAB_SIZE,
     "n_positions": 1024,
+    "n_ctx": 1024,
     "n_embd": OUTPUT_DIM_MEDIUM,
     "n_layer": 24,
     "n_head": NUM_HEADS_MEDIUM,

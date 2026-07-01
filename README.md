@@ -10,7 +10,9 @@ conda install -c conda-forge lxml -y \
 conda install -c conda-forge nltk -y \
 pip install "tensorflow[and-cuda]" \
 pip install wandb \
-pip install safetensors
+pip install safetensors \
+pip install gguf \
+pip install transformers
 
 **Importante:** \
 No hacer `$ conda update --all -c conda-forge -y` porque instala una versión de PyTorch sin CUDA \
