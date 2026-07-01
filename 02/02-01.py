@@ -71,7 +71,16 @@ print("Total number of characters:", len(raw_text))
 print(raw_text[:99])
 print()
 
-# Tokenizador manual
+
+# Tokenizador manual v1
+text = "Hello, world. This, is a test."
+result = re.split(r'(\s)', text)
+print("Text: ", text)
+print("Result: ", result)
+print()
+
+
+# Tokenizador manual v2
 text = "Hello, world. This, is a test."
 result = re.split(r'([,.:;?_!"()\']|--|\s)', text)
 result = [item.strip() for item in result if item.strip()]
@@ -80,7 +89,8 @@ print("Result: ", result)
 print()
 
 
-# 2. Creo una lista de palabras y símbolos a partir del texto mediante una expresión regular (variable preprocessed)
+
+# Creo una lista de palabras y símbolos a partir del texto mediante una expresión regular (variable preprocessed)
 preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
 preprocessed = [item.strip() for item in preprocessed if item.strip()]
 print(f"Len libro: {len(raw_text)} (número de caracteres en la variable tipo text string)")
@@ -89,6 +99,8 @@ print(f"Len preprocessed: {len(preprocessed)} (número de items en la lista = n�
 print("Preprocessed: ", preprocessed[:15])
 print()
 
+
+"""
 
 # Creo una lista de tokens, ordenados alfabéticamente
 all_words = sorted(set(preprocessed))
@@ -158,6 +170,6 @@ print("Texto: ", text)
 print("Codificado: ", ids)
 print("Decodificado: ", tokenizer.decode(ids))
 print()
-
+"""
 
 
