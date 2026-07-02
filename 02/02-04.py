@@ -49,22 +49,12 @@ print("Number of characters:", len(raw_text))
 integers = tokenizer.encode(raw_text)
 console.print(f"Tokenizing", style="gold1")
 print("Number of tokens:", len(integers))
-print()
-
-"""
-# Muestra todo el texto del libro
-#print("Texto: ", raw_text)
-
-# Muestra todos los tokens
-#print("Tokens: ", integers)
 
 # Genera el texto a partir de los tokens
 console.print(f"Decoding", style="gold1")
 strings = tokenizer.decode(integers)
 print("Total number of words (decoded):", len(strings))
-
-# Muestra todo el texto del libro, a partir de los tokens
-#print("Back to text: ", strings)
+print()
 
 
 #Quito los primeros 50 tokens. enc_sample = todo los tokens desde el número 51 al final
@@ -77,7 +67,7 @@ enc_sample = integers[50:]
 context_size = 4
 x = enc_sample[:context_size]
 y = enc_sample[1:context_size+1]
-print(f"\nx: {x}")
+print(f"x: {x}")
 print(f"y:      {y}")
 print() 
 
@@ -93,7 +83,7 @@ for i in range(1, context_size+1):
     print(tokenizer.decode(context), "---->", tokenizer.decode([desired]))
 print()
 
-"""
+
 
 # Workflow
 # --------

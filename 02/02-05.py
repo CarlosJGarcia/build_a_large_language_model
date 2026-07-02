@@ -3,10 +3,7 @@
 # Basel 08/Apr/2026
 
 import torch
-from torch.utils.data import Dataset, DataLoader
-
-# Compruebo versión de torch
-print(f"Torch version: {torch.__version__}")
+from torch.utils.data import Dataset
 
 
 class GPTDatasetV1(Dataset):
@@ -28,7 +25,8 @@ class GPTDatasetV1(Dataset):
     def __getitem__(self, idx):
         return self.input_ids[idx], self.target_ids[idx]
 
-
+# Compruebo versión de torch
+print(f"Torch version: {torch.__version__}")
 
 
 
