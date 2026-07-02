@@ -108,39 +108,36 @@ for i, item in enumerate(vocab.items()):
 print()
 
 
-"""
-# Añado dos palabras al vocabulario: <|endoftext|> para separar textos diferentes y <|junk|> para identificar con un token palabras que no estén en el dicc.
-all_tokens = sorted(list(set(preprocessed)))
+# Añado dos tokens: <|endoftext|> para separar textos diferentes y <|unk|> para identificar palabras que no estén en el vocabulario
+console.print(f"Tokenizer v2 aplicado al libro + <|endoftext|> + <|junk|>", style="gold1", highlight=False)
+all_tokens = sorted(list(set(result)))
 all_tokens.extend(["<|endoftext|>", "<|unk|>"])
 vocab = {token:integer for integer,token in enumerate(all_tokens)}
-
-print("Número de entradas en el Vocabulario: ", len(vocab.items()))
-print("Tipo de dato del Vocabulario: ", type(vocab))
-print()
-
+vocab_size = len(all_tokens)
+print(f"Vocabulary size: {vocab_size} tokens")
 
 # Muestro los primeros 5 items del vocabulario
-print("Primeros 5 items del Vocabulario:")
+print("(Token, ID)")
 items = list(vocab.items())
 for i in range(5):
     print(items[i])
-print()
+print("...")
 
 # Muestro los últimos 5 items del vocabulario
-print("Últimos 5 items del Vocabulario:")
 for i, item in enumerate(list(vocab.items())[-5:]):
     print(item)
 print()
 
 
-# 4. Creo un objeto tokenizer a partir de la clase SimpleTokenizerV1 y del vocabulario
+
+# SimpleTokenizerV1
 text = "It's the last he painted, you know, Mrs. Gisburn said with pardonable pride."
 tokenizer = SimpleTokenizerV1(vocab)
 
-print("Codificando v1.")
+console.print("Simple Tokenizer v1.", style="gold1")
 ids = tokenizer.encode(text)
 print("Texto: ", text)
-print("Codificado: ", ids)  
+print("Token IDs: ", ids)  
 print("Decodificado: ", tokenizer.decode(ids))
 print()
 
@@ -149,13 +146,9 @@ text1 = "Hello, do you like tea?"
 text2 = "In the sunlit terraces of the palace."
 text = " <|endoftext|> ".join((text1, text2))
 tokenizer = SimpleTokenizerV2(vocab)
-
-print("Codificando v2.")
+console.print("Simple Tokenizer v2.", style="gold1")
 ids = tokenizer.encode(text)
 print("Texto: ", text)
-print("Codificado: ", ids)
+print("Token IDs: ", ids)
 print("Decodificado: ", tokenizer.decode(ids))
 print()
-"""
-
-
