@@ -53,20 +53,11 @@ class SimpleTokenizerV2:
 
 
 
-# Abro y cargo el fichero de texto (libro) Manera 'antigua'. Old way - manual, risky
-"""
-f = open("file.txt", "r")
-raw_text = f.read()
-f.close()  # ← easy to forget! and won't run if an error occurs above
-"""
-
 # Cargo el libro como una cadena de texto (variable raw_text)
-# New way, with 'Python Context Manager' (with ... as). Una especie de try - catch
 with open(BOOK_PATH, "r", encoding="utf-8") as f:
-    console = Console()
-    
     raw_text = f.read()
 
+console = Console()
 console.print(f"\nFile {BOOK_PATH} loaded", style="gold1", highlight=False)
 print("Total number of characters:", len(raw_text))
 print(raw_text[:99])
@@ -91,31 +82,25 @@ print("Result: ", result)
 print()
 
 
-
 # Aplico el tokenizador manual v2 al texto del libro
 result = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
 result = [item.strip() for item in result if item.strip()]
 console.print(f"Tokenizer v2 aplicado al libro", style="gold1")
 print(f"Número de tokens en el libro: {len(result)}")
 print("Result: ", result[:15])
-print()
 
 
-"""
+# Lista de tokens, ordenados alfabéticamente
+all_tokens = sorted(set(result))
+vocab_size = len(all_tokens)
+print(f"Vocabulary size: {vocab_size} tokens")
 
-# Creo una lista de tokens, ordenados alfabéticamente
-all_words = sorted(set(preprocessed))
-vocab_size = len(all_words)
-
-print(f"Len all_words: {vocab_size} (número de tokens en el diccionario)")
-
-
-# 3. A partir de la lista de palabras, creo el vocabulario, una lista de palabras y símbolos únicos donde cada uno tiene un id (variable vocab)
-# Vocabulary: En el conexto de IA, conjunto de palabras únicas, con un número único (token) asociado
+# A partir de la lista de palabras, creo el vocabulario, una lista de palabras y signos únicos donde cada uno tiene un id 
+# Vocabulary: En el conexto de IA, conjunto de palabras únicas (tokens), con un número único (entero 0, 1, 2 ...) asociado
 # Dictionary: La estructura Python que se utiliza para guardar el Vocabulario. Es una lista de pares id-contenido
-
 # Muestro los 15 primeros tokens en el diccionario
-vocab = {token:integer for integer,token in enumerate(all_words)}
+vocab = {token:integer for integer,token in enumerate(all_tokens)}
+print("(Token, ID)")
 for i, item in enumerate(vocab.items()):
     print(item)
     if i >= 15:
@@ -123,7 +108,7 @@ for i, item in enumerate(vocab.items()):
 print()
 
 
-
+"""
 # Añado dos palabras al vocabulario: <|endoftext|> para separar textos diferentes y <|junk|> para identificar con un token palabras que no estén en el dicc.
 all_tokens = sorted(list(set(preprocessed)))
 all_tokens.extend(["<|endoftext|>", "<|unk|>"])
