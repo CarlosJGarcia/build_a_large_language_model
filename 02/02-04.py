@@ -9,20 +9,21 @@ from importlib.metadata import version
 BOOK_PATH = "../data/raw/the-verdict.txt"
 
 # Compruebo versión de tiktoker
-print("tiktoken version:", version("tiktoken"))
+print("\nTiktoken version:", version("tiktoken"))
 
 # Creo un objeto tokenizer tipo GPT2
 console = Console()
-console.print(f"\nTokenizer - Tiktoken GPT2", style="gold1")
 tokenizer = tiktoken.get_encoding("gpt2")
+console.print(f"Tokenizer - tiktoken, encoding gpt2\n", style="gold1")
+
 
 # Prueba, incluyendo un marcador de cambio de fuente de datos "<|endoftext|>" y una palabra que no está en el diccionario "some-unknownPlace"
 text = "Hello, do you like tea? <|endoftext|> In the sunlit terrace of some-unknownPlace."
 integers = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
-strings = tokenizer.decode(integers)
+string = tokenizer.decode(integers)
 print("Texto: ", text)
 print("Tokens: ", integers)
-print("Back to text: ", strings)
+print("Back to text: ", string)
 print()
 
 
@@ -31,25 +32,26 @@ print()
 #Lastly, call the decode method on the token IDs to check whether it can reconstruct the original input, “Akwirw ier.”
 text = "Akwirw ier"
 integers = tokenizer.encode(text)
-strings = tokenizer.decode(integers)
+string = tokenizer.decode(integers)
 print("Texto: ", text)
 print("Tokens: ", integers)
-print("Back to text: ", strings)
+print("Back to text: ", string)
 print()
 
 
 # Carga el libro "The Veredict"
 with open(BOOK_PATH, "r", encoding="utf-8") as f:
-    console.print(f"Reading file", style="gold1")
     raw_text = f.read()
-
-print("Total number of words (original):", len(raw_text))
+console.print(f"\nFile {BOOK_PATH} loaded", style="gold1", highlight=False)
+print("Number of characters:", len(raw_text))
 
 # Tokeniza el libro
-console.print(f"Tokenizing", style="gold1")
 integers = tokenizer.encode(raw_text)
-print("Total number of tokens:", len(integers))
+console.print(f"Tokenizing", style="gold1")
+print("Number of tokens:", len(integers))
+print()
 
+"""
 # Muestra todo el texto del libro
 #print("Texto: ", raw_text)
 
@@ -91,6 +93,7 @@ for i in range(1, context_size+1):
     print(tokenizer.decode(context), "---->", tokenizer.decode([desired]))
 print()
 
+"""
 
 # Workflow
 # --------
@@ -101,3 +104,4 @@ print()
 # GPU: The heavy neural network (like your Phi-4 or your scratch-built LLM) uses thousands of CUDA cores to do all the massive math on those numbers to predict the next token.
 # Transferencia: La GPU devuelve a la CPU un ID - valor entero- que es la siguiente palabra prevista
 # CPU: Mediante tiktoken, converitr el ID entero en texto y mostrarlo en pantalla
+
