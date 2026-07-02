@@ -64,9 +64,10 @@ f.close()  # ← easy to forget! and won't run if an error occurs above
 # New way, with 'Python Context Manager' (with ... as). Una especie de try - catch
 with open(BOOK_PATH, "r", encoding="utf-8") as f:
     console = Console()
-    console.print(f"\nReading file", style="gold1")
+    
     raw_text = f.read()
 
+console.print(f"\nFile {BOOK_PATH} loaded", style="gold1", highlight=False)
 print("Total number of characters:", len(raw_text))
 print(raw_text[:99])
 print()
@@ -74,29 +75,29 @@ print()
 
 # Tokenizador manual v1
 text = "Hello, world. This, is a test."
-result = re.split(r'(\s)', text)
+result = re.split(r'(\s)', text)                              # Divide el string en una lista de palabras que incluyen los signos de puntuación
+console.print(f"Tokenizer v1", style="gold1")
 print("Text: ", text)
 print("Result: ", result)
 print()
 
 
 # Tokenizador manual v2
-text = "Hello, world. This, is a test."
-result = re.split(r'([,.:;?_!"()\']|--|\s)', text)
-result = [item.strip() for item in result if item.strip()]
+console.print(f"Tokenizer v2", style="gold1")
+result = re.split(r'([,.:;?_!"()\']|--|\s)', text)             # Divide el string en una lista de palabras que incluyen los signos de puntuación
+result = [item.strip() for item in result if item.strip()]     # Limpia la lista, quita palabras vacías y espacios delante/detrás
 print("Text: ", text)
 print("Result: ", result)
 print()
 
 
 
-# Creo una lista de palabras y símbolos a partir del texto mediante una expresión regular (variable preprocessed)
-preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
-preprocessed = [item.strip() for item in preprocessed if item.strip()]
-print(f"Len libro: {len(raw_text)} (número de caracteres en la variable tipo text string)")
-print("Tipo de preprocessed: ", type(preprocessed))
-print(f"Len preprocessed: {len(preprocessed)} (número de items en la lista = número de tokens en el libro)")
-print("Preprocessed: ", preprocessed[:15])
+# Aplico el tokenizador manual v2 al texto del libro
+result = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
+result = [item.strip() for item in result if item.strip()]
+console.print(f"Tokenizer v2 aplicado al libro", style="gold1")
+print(f"Número de tokens en el libro: {len(result)}")
+print("Result: ", result[:15])
 print()
 
 
